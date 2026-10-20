@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Menge festlegen</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.08);
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      color: var(--gray-900);
+      line-height: 1.7;
+      background: var(--gray-50);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-img { height: 70px; width: auto; }
+
+    .header-back {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .header-back:hover { color: var(--primary); }
+
+    .progress-section {
+      background: var(--white);
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .progress-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .step-circle.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(122, 181, 29, 0.35);
+    }
+
+    .step-circle.done {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .step-circle.inactive {
+      background: var(--white);
+      color: var(--gray-500);
+      border: 2px solid var(--gray-300);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .step-label.active { color: var(--primary-dark); }
+    .step-label.done { color: var(--primary); }
+
+    /* MAIN */
+    .main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px 120px;
+    }
+
+    .main h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .main h1 span { color: var(--primary); }
+
+    .main-subtitle {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 1rem;
+      margin-bottom: 40px;
+    }
+
+    /* BRANCH QUANTITY CARDS */
+    .quantity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .quantity-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .quantity-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .qc-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .qc-info h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .qc-price {
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* QUANTITY OPTIONS */
+    .quantity-options {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .qty-option {
+      background: var(--gray-50);
+      border: 2px solid var(--gray-100);
+      border-radius: 10px;
+      padding: 14px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .qty-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .qty-option.selected {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(122, 181, 29, 0.1), rgba(142, 204, 46, 0.06));
+      box-shadow: 0 2px 10px rgba(122, 181, 29, 0.15);
+    }
+
+    .qty-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .qty-option.selected .qty-value { color: var(--primary-dark); }
+
+    .qty-label {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+
+    .qty-sublabel {
+      font-size: 0.65rem;
+      color: var(--gray-300);
+      margin-top: 2px;
+    }
+
+    /* CUSTOM INPUT */
+    .qty-custom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .qty-custom label {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    .qty-custom input {
+      width: 100px;
+      padding: 8px 12px;
+      border: 2px solid var(--gray-100);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: var(--font);
+      color: var(--dark);
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .qty-custom input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .qty-custom .hint {
+      font-size: 0.78rem;
+      color: var(--gray-300);
+    }
+
+    /* BOTTOM BAR */
+    .bottom-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--white);
+      border-top: 1px solid var(--gray-100);
+      padding: 20px 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+      z-index: 10;
+    }
+
+    .bottom-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-zurueck {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+      font-family: var(--font);
+    }
+
+    .btn-zurueck:hover { color: var(--primary); }
+
+    .summary-info {
+      text-align: center;
+    }
+
+    .summary-info .total-leads {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .summary-info .total-leads strong {
+      color: var(--primary);
+    }
+
+    .summary-info .total-sub {
+      font-size: 0.78rem;
+      color: var(--gray-500);
+    }
+
+    .btn-weiter {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 40px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.3);
+      transition: all 0.25s ease;
+    }
+
+    .btn-weiter:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-weiter:disabled {
+      background: var(--gray-300);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-weiter .arrow {
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .btn-weiter:hover .arrow { transform: translateX(4px); }
+
+    @media (max-width: 600px) {
+      .quantity-options { grid-template-columns: repeat(3, 1fr); }
+      .main h1 { font-size: 1.6rem; }
+      .bottom-inner { flex-direction: column; gap: 12px; }
+      .btn-zurueck { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+      <a href="index.html" class="header-back">&#8592; Zur Startseite</a>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-section">
+    <div class="progress-inner">
+      <div class="progress-steps">
+        <div class="progress-step">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Branche</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle active">2</div>
+          <span class="step-label active">Menge</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">3</div>
+          <span class="step-label">Konto erstellen</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">4</div>
+          <span class="step-label">Bezahlen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>Wie viele Leads brauchst du <span>pro Branche</span>?</h1>
+    <p class="main-subtitle">Lege für jede gewählte Branche die gewünschte Menge fest — flexibel und individuell.</p>
+
+    <div class="quantity-list" id="quantityList">
+      <!-- Dynamisch befüllt -->
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <button class="btn-zurueck" onclick="window.location.href='branchen.html'">&#8592; Zurück</button>
+      <div class="summary-info">
+        <div class="total-leads">Gesamt: <strong id="totalLeads">0</strong> Leads</div>
+        <div class="total-sub" id="totalBranches"></div>
+      </div>
+      <button class="btn-weiter" id="btnWeiter" disabled onclick="window.location.href='registrieren.html'">
+        Weiter <span class="arrow">&#8594;</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    var branchData = {
+      'strom-gas':        { icon: '\u{1F4A1}', name: 'Strom & Gas',        price: '19,90' },
+      'energieberatung':  { icon: '\u{1F33F}', name: 'Energieberatung',    price: '24,90' },
+      'photovoltaik':     { icon: '☀️', name: 'Photovoltaik',    price: '49,90' },
+      'waermepumpe':      { icon: '\u{1F321}️', name: 'Wärmepumpe',   price: '49,90' },
+      'fenster':          { icon: '\u{1F7E7}', name: 'Fenster',            price: '39,90' },
+      'dachfenster':      { icon: '\u{1F3DE}️', name: 'Dachfenster',  price: '39,90' },
+      'haustueren':       { icon: '\u{1F6AA}', name: 'Haustüren',          price: '39,90' },
+      'alarmanlagen':     { icon: '\u{1F513}', name: 'Alarmanlagen',       price: '39,90' },
+      'videoueberwachung':{ icon: '\u{1F4F9}', name: 'Videoüberwachung',   price: '39,90' },
+      'kaffeevollautomat':{ icon: '☕',     name: 'Kaffeevollautomat',  price: '59,90' },
+      'wasserspender':    { icon: '\u{1F4A7}', name: 'Wasserspender',      price: '59,90' },
+      'snackautomat':     { icon: '\u{1F36C}', name: 'Snackautomat',       price: '59,90' },
+      'treppenlift':      { icon: '\u{1F6CA}', name: 'Treppenlift',        price: '119,90' },
+      'immobilien':       { icon: '\u{1F3E0}', name: 'Immobilien',         price: '149,90' }
+    };
+
+    var quantities = [
+      { value: '1-10',    label: '1–10',    sub: 'Leads' },
+      { value: '10-25',   label: '10–25',   sub: 'Leads' },
+      { value: '25-50',   label: '25–50',   sub: 'Leads' },
+      { value: '50-100',  label: '50–100',  sub: 'Leads' },
+      { value: '100+',    label: '100+',    sub: 'Leads' }
+    ];
+
+    function buildCards() {
+      var selected = [];
+      try { selected = JSON.parse(localStorage.getItem('leadarea_branches') || '[]'); } catch(e) {}
+
+      if (selected.length === 0) {
+        selected = ['strom-gas', 'photovoltaik'];
+      }
+
+      var list = document.getElementById('quantityList');
+      list.innerHTML = '';
+
+      selected.forEach(function(key) {
+        var b = branchData[key];
+        if (!b) return;
+
+        var card = document.createElement('div');
+        card.className = 'quantity-card';
+        card.setAttribute('data-branch', key);
+
+        var optionsHtml = quantities.map(function(q) {
+          return '<div class="qty-option" data-qty="' + q.value + '" onclick="selectQty(this)">' +
+            '<div class="qty-value">' + q.label + '</div>' +
+            '<div class="qty-label">' + q.sub + '</div>' +
+          '</div>';
+        }).join('');
+
+        card.innerHTML =
+          '<div class="quantity-card-header">' +
+            '<div class="qc-icon">' + b.icon + '</div>' +
+            '<div class="qc-info">' +
+              '<h3>' + b.name + '</h3>' +
+              '<div class="qc-price">ab ' + b.price + ' € / Lead</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="quantity-options">' + optionsHtml + '</div>' +
+          '<div class="qty-custom">' +
+            '<label>Oder genaue Anzahl:</label>' +
+            '<input type="number" min="1" max="9999" placeholder="z.B. 75" oninput="customQty(this)">' +
+            '<span class="hint">Leads / Monat</span>' +
+          '</div>';
+
+        list.appendChild(card);
+      });
+
+      document.getElementById('totalBranches').textContent = 'in ' + selected.length + ' Branche(n)';
+      updateTotal();
+    }
+
+    function selectQty(el) {
+      var card = el.closest('.quantity-card');
+      card.querySelectorAll('.qty-option').forEach(function(opt) {
+        opt.classList.remove('selected');
+      });
+      el.classList.add('selected');
+      card.querySelector('.qty-custom input').value = '';
+      updateTotal();
+    }
+
+    function customQty(input) {
+      var card = input.closest('.quantity-card');
+      card.querySelectorAll('.qty-option').forEach(function(opt) {
+        opt.classList.remove('selected');
+      });
+      updateTotal();
+    }
+
+    function updateTotal() {
+      var total = 0;
+      var allSet = true;
+
+      document.querySelectorAll('.quantity-card').forEach(function(card) {
+        var selectedOpt = card.querySelector('.qty-option.selected');
+        var customInput = card.querySelector('.qty-custom input');
+
+        if (selectedOpt) {
+          var val = selectedOpt.getAttribute('data-qty');
+          var num = parseInt(val.replace('+', '').split('-').pop());
+          total += num;
+        } else if (customInput && customInput.value) {
+          total += parseInt(customInput.value) || 0;
+        } else {
+          allSet = false;
+        }
+      });
+
+      document.getElementById('totalLeads').textContent = total > 0 ? '~' + total : '0';
+      document.getElementById('btnWeiter').disabled = !allSet;
+    }
+
+    buildCards();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+<section class="dark-area" style="padding: 60px 0;">
+  <div class="container">
+    <div class="form-card">
+      <h2>Einloggen</h2>
+      {{alertHtml}}
+      <form method="POST" action="/login">
+        <div class="form-group">
+          <label for="email">E-Mail</label>
+          <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Passwort</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Einloggen</button>
+      </form>
+      <p style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--gray-500);">
+        Noch kein Konto? <a href="/register" style="color:var(--primary); font-weight:600;">Jetzt registrieren</a>
+      </p>
+    </div>
+  </div>
+</section>

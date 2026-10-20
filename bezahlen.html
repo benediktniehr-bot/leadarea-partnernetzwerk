@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Bezahlung</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.08);
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --paypal: #0070ba;
+      --paypal-dark: #003087;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      color: var(--gray-900);
+      line-height: 1.7;
+      background: var(--gray-50);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-img { height: 70px; width: auto; }
+
+    .header-back {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .header-back:hover { color: var(--primary); }
+
+    .progress-section {
+      background: var(--white);
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .progress-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .step-circle.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(122, 181, 29, 0.35);
+    }
+
+    .step-circle.done {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .step-circle.inactive {
+      background: var(--white);
+      color: var(--gray-500);
+      border: 2px solid var(--gray-300);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .step-label.active { color: var(--primary-dark); }
+    .step-label.done { color: var(--primary); }
+
+    /* MAIN */
+    .main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .main h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .main h1 span { color: var(--primary); }
+
+    .main-subtitle {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 1rem;
+      margin-bottom: 40px;
+    }
+
+    /* TWO COLUMN */
+    .payment-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* PAYMENT OPTIONS */
+    .payment-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .payment-option {
+      background: var(--white);
+      border: 2px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .payment-option:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.1);
+    }
+
+    .payment-option.selected {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(122, 181, 29, 0.04), rgba(142, 204, 46, 0.02));
+      box-shadow: 0 4px 20px rgba(122, 181, 29, 0.15);
+    }
+
+    .payment-option.selected::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), #8ecc2e);
+      border-radius: 16px 16px 0 0;
+    }
+
+    .payment-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .payment-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .payment-radio {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .payment-option.selected .payment-radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .payment-option.selected .payment-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--white);
+    }
+
+    .payment-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .payment-icon {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+    }
+
+    .payment-desc {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-left: 36px;
+      line-height: 1.5;
+    }
+
+    /* PREPAID BADGE */
+    .prepaid-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    /* PREPAID DETAILS */
+    .prepaid-details {
+      margin-left: 36px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .payment-option.selected .prepaid-details { display: block; }
+
+    .prepaid-packages {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .prepaid-pkg {
+      background: var(--gray-50);
+      border: 2px solid var(--gray-100);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .prepaid-pkg:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .prepaid-pkg.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 2px 10px rgba(122, 181, 29, 0.15);
+    }
+
+    .prepaid-pkg .pkg-amount {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .prepaid-pkg.selected .pkg-amount { color: var(--primary-dark); }
+
+    .prepaid-pkg .pkg-bonus {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .prepaid-pkg .pkg-label {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .prepaid-pkg .pkg-badge {
+      position: absolute;
+      top: -8px;
+      right: -4px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .prepaid-note {
+      font-size: 0.78rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    /* CARD FORM */
+    .card-details {
+      margin-left: 36px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .payment-option.selected .card-details { display: block; }
+
+    .card-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .card-group {
+      margin-bottom: 14px;
+    }
+
+    .card-group.full { grid-column: 1 / -1; }
+
+    .card-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 4px;
+    }
+
+    .card-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid var(--gray-100);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: var(--font);
+      color: var(--dark);
+      background: var(--gray-50);
+      transition: all 0.2s;
+    }
+
+    .card-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(122, 181, 29, 0.1);
+    }
+
+    .card-group input::placeholder { color: var(--gray-300); }
+
+    .card-icons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .card-icon-badge {
+      padding: 4px 10px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    /* PAYPAL DETAILS */
+    .paypal-details {
+      margin-left: 36px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .payment-option.selected .paypal-details { display: block; }
+
+    .paypal-info {
+      background: #f0f7ff;
+      border: 1px solid #cce0f5;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* SUBMIT */
+    .submit-section {
+      margin-top: 28px;
+    }
+
+    .btn-pay {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.3);
+      transition: all 0.25s ease;
+      font-family: var(--font);
+    }
+
+    .btn-pay:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 8px 32px rgba(122, 181, 29, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-pay:disabled {
+      background: var(--gray-300);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pay-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--gray-300);
+      margin-top: 10px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .summary-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.85rem;
+    }
+
+    .summary-item:last-child { border-bottom: none; }
+
+    .summary-item-name {
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .summary-item-detail {
+      text-align: right;
+    }
+
+    .summary-item-qty {
+      color: var(--gray-700);
+      font-weight: 500;
+      font-size: 0.82rem;
+    }
+
+    .summary-item-price {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 14px;
+      margin-top: 6px;
+      border-top: 2px solid var(--gray-100);
+    }
+
+    .summary-total-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .summary-total-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .summary-edit {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      transition: color 0.2s;
+    }
+
+    .summary-edit:hover { color: var(--primary); }
+
+    /* TRUST */
+    .security-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .security-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 16px;
+    }
+
+    .security-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .security-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.83rem;
+      color: var(--gray-700);
+    }
+
+    .security-list .icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .guarantee-card {
+      background: linear-gradient(135deg, #f7f9f3, #eef5e0);
+      border: 1px solid rgba(122, 181, 29, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .guarantee-icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .guarantee-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .guarantee-card p {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      line-height: 1.6;
+    }
+
+    /* BACK */
+    .back-row {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .btn-zurueck {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: color 0.2s;
+    }
+
+    .btn-zurueck:hover { color: var(--primary); }
+
+    @media (max-width: 768px) {
+      .payment-layout { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
+      .main h1 { font-size: 1.6rem; }
+      .prepaid-packages { grid-template-columns: 1fr; }
+      .card-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+      <a href="index.html" class="header-back">&#8592; Zur Startseite</a>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-section">
+    <div class="progress-inner">
+      <div class="progress-steps">
+        <div class="progress-step">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Branche</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Menge</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Konto erstellen</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle active">4</div>
+          <span class="step-label active">Bezahlen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>Wie möchtest du <span>bezahlen</span>?</h1>
+    <p class="main-subtitle">Wähle deine bevorzugte Zahlungsmethode — sicher, schnell und flexibel.</p>
+
+    <div class="payment-layout">
+
+      <!-- PAYMENT OPTIONS -->
+      <div class="payment-section">
+
+        <!-- PREPAID -->
+        <div class="payment-option" onclick="selectPayment(this, 'prepaid')">
+          <div class="payment-header">
+            <div class="payment-header-left">
+              <div class="payment-radio"></div>
+              <span class="payment-title">Prepaid-Guthaben <span class="prepaid-badge">Spare bis 10%</span></span>
+            </div>
+            <span class="payment-icon">&#128176;</span>
+          </div>
+          <p class="payment-desc">Lade Guthaben auf dein LeadArea-Konto und bestelle flexibel daraus. Je mehr du auflädst, desto mehr sparst du.</p>
+          <div class="prepaid-details">
+            <div class="prepaid-packages">
+              <div class="prepaid-pkg" onclick="event.stopPropagation(); selectPkg(this)">
+                <div class="pkg-amount">100 €</div>
+                <div class="pkg-label">Guthaben</div>
+              </div>
+              <div class="prepaid-pkg" onclick="event.stopPropagation(); selectPkg(this)">
+                <div class="pkg-amount">250 €</div>
+                <div class="pkg-bonus">+12,50 € Bonus</div>
+                <div class="pkg-label">5% extra</div>
+              </div>
+              <div class="prepaid-pkg" onclick="event.stopPropagation(); selectPkg(this)">
+                <span class="pkg-badge">Beliebt</span>
+                <div class="pkg-amount">500 €</div>
+                <div class="pkg-bonus">+50 € Bonus</div>
+                <div class="pkg-label">10% extra</div>
+              </div>
+            </div>
+            <p class="prepaid-note">&#128161; Guthaben ist 12 Monate gültig und für alle Branchen einsetzbar. Einzahlung per Überweisung oder Kreditkarte.</p>
+          </div>
+        </div>
+
+        <!-- KREDITKARTE -->
+        <div class="payment-option" onclick="selectPayment(this, 'card')">
+          <div class="payment-header">
+            <div class="payment-header-left">
+              <div class="payment-radio"></div>
+              <span class="payment-title">Kreditkarte</span>
+            </div>
+            <span class="payment-icon">&#128179;</span>
+          </div>
+          <p class="payment-desc">Bezahle sicher per Kreditkarte. Deine Daten werden verschlüsselt über Stripe verarbeitet.</p>
+          <div class="card-details">
+            <div class="card-row">
+              <div class="card-group full">
+                <label>Kartennummer</label>
+                <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" onclick="event.stopPropagation()">
+              </div>
+              <div class="card-group">
+                <label>Gültig bis</label>
+                <input type="text" placeholder="MM / JJ" maxlength="7" onclick="event.stopPropagation()">
+              </div>
+              <div class="card-group">
+                <label>CVV</label>
+                <input type="text" placeholder="123" maxlength="4" onclick="event.stopPropagation()">
+              </div>
+            </div>
+            <div class="card-icons">
+              <span class="card-icon-badge">VISA</span>
+              <span class="card-icon-badge">Mastercard</span>
+              <span class="card-icon-badge">AMEX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYPAL -->
+        <div class="payment-option" onclick="selectPayment(this, 'paypal')">
+          <div class="payment-header">
+            <div class="payment-header-left">
+              <div class="payment-radio"></div>
+              <span class="payment-title">PayPal</span>
+            </div>
+            <span class="payment-icon">&#127760;</span>
+          </div>
+          <p class="payment-desc">Bezahle bequem über dein PayPal-Konto — schnell, sicher und mit Käuferschutz.</p>
+          <div class="paypal-details">
+            <div class="paypal-info">
+              &#128274; Du wirst nach dem Klick auf &bdquo;Jetzt bezahlen&ldquo; sicher zu PayPal weitergeleitet. Nach erfolgreicher Zahlung kommst du automatisch zurück zu LeadArea.
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="submit-section">
+          <button class="btn-pay" id="btnPay" disabled onclick="window.location.href='bestaetigung.html'">Jetzt bezahlen</button>
+          <p class="pay-note">&#128274; Sichere Zahlung — verschlüsselt und DSGVO-konform</p>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- ORDER SUMMARY -->
+        <div class="summary-card">
+          <h3>&#128203; Bestellübersicht</h3>
+          <div class="summary-item">
+            <span class="summary-item-name">&#9728;&#65039; Photovoltaik</span>
+            <div class="summary-item-detail">
+              <div class="summary-item-qty">25–50 Leads</div>
+              <div class="summary-item-price">ab 49,90 € / Lead</div>
+            </div>
+          </div>
+          <div class="summary-item">
+            <span class="summary-item-name">&#128161; Strom &amp; Gas</span>
+            <div class="summary-item-detail">
+              <div class="summary-item-qty">10–25 Leads</div>
+              <div class="summary-item-price">ab 19,90 € / Lead</div>
+            </div>
+          </div>
+          <div class="summary-total">
+            <span class="summary-total-label">Geschätzt ab</span>
+            <span class="summary-total-value">1.446,– €</span>
+          </div>
+          <a href="branchen.html" class="summary-edit">&#9998; Auswahl ändern</a>
+        </div>
+
+        <!-- SECURITY -->
+        <div class="security-card">
+          <h3>&#128274; Sichere Bezahlung</h3>
+          <ul class="security-list">
+            <li><span class="icon">&#128274;</span> SSL-verschlüsselte Übertragung</li>
+            <li><span class="icon">&#9878;</span> DSGVO-konforme Datenverarbeitung</li>
+            <li><span class="icon">&#128179;</span> Zahlungen über Stripe (PCI DSS Level 1)</li>
+            <li><span class="icon">&#127760;</span> PayPal mit Käuferschutz</li>
+          </ul>
+        </div>
+
+        <!-- GUARANTEE -->
+        <div class="guarantee-card">
+          <div class="guarantee-icon">&#128170;</div>
+          <h4>Unsere Qualitätsgarantie</h4>
+          <p>Jeder Lead, der nicht deinen Anforderungen entspricht, kann innerhalb von 14 Tagen kostenlos reklamiert werden. Kein Risiko für dich.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="back-row">
+      <button class="btn-zurueck" onclick="window.location.href='registrieren.html'">&#8592; Zurück zur Registrierung</button>
+    </div>
+  </div>
+
+  <script>
+    var selectedMethod = null;
+
+    function selectPayment(el, method) {
+      document.querySelectorAll('.payment-option').forEach(function(opt) {
+        opt.classList.remove('selected');
+      });
+      el.classList.add('selected');
+      selectedMethod = method;
+      document.getElementById('btnPay').disabled = false;
+
+      var btn = document.getElementById('btnPay');
+      if (method === 'paypal') {
+        btn.textContent = 'Weiter zu PayPal';
+      } else if (method === 'prepaid') {
+        btn.textContent = 'Guthaben aufladen & bestellen';
+      } else {
+        btn.textContent = 'Jetzt bezahlen';
+      }
+    }
+
+    function selectPkg(el) {
+      document.querySelectorAll('.prepaid-pkg').forEach(function(p) {
+        p.classList.remove('selected');
+      });
+      el.classList.add('selected');
+    }
+  </script>
+
+</body>
+</html>

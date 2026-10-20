@@ -1,0 +1,19 @@
+<section class="dark-area" style="padding-top:40px; padding-bottom:60px;">
+  <div class="container">
+    <div class="dashboard-layout">
+      <div class="sidebar">
+        <h3>Partner</h3>
+        <ul class="sidebar-nav">
+          <li><a href="/partner/dashboard" class="{{activeOverview}}">Übersicht</a></li>
+          <li><a href="/partner/dashboard/leads" class="{{activeLeads}}">Meine Leads</a></li>
+          <li><a href="/partner/dashboard/imports" class="{{activeImports}}">Meine Imports</a></li>
+          {{uploadNavItem}}
+          <li><a href="/partner/dashboard/gutschriften" class="{{activeGutschriften}}">Meine Gutschriften</a></li>
+        </ul>
+      </div>
+      <div class="dashboard-content">
+        {{partnerContent}}
+      </div>
+    </div>
+  </div>
+</section>

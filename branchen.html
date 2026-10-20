@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Branche wählen</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.08);
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      color: var(--gray-900);
+      line-height: 1.7;
+      background: var(--gray-50);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* HEADER */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-img { height: 70px; width: auto; }
+
+    .header-back {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .header-back:hover { color: var(--primary); }
+
+    /* PROGRESS */
+    .progress-section {
+      background: var(--white);
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .progress-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .step-circle.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(122, 181, 29, 0.35);
+    }
+
+    .step-circle.done {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .step-circle.inactive {
+      background: var(--white);
+      color: var(--gray-500);
+      border: 2px solid var(--gray-300);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .step-label.active { color: var(--primary-dark); }
+
+    /* MAIN */
+    .main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .main h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .main h1 span { color: var(--primary); }
+
+    .main-subtitle {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .main-hint {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--primary-dark);
+      font-weight: 600;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* CATEGORY SECTIONS */
+    .category-section {
+      margin-bottom: 36px;
+    }
+
+    .category-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+      padding-left: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-300);
+    }
+
+    /* BRANCH CARDS */
+    .branch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .branch-card {
+      background: var(--white);
+      border: 2px solid var(--gray-100);
+      border-radius: 14px;
+      padding: 22px 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      user-select: none;
+    }
+
+    .branch-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .branch-card.selected {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(122, 181, 29, 0.06), rgba(142, 204, 46, 0.04));
+      box-shadow: 0 4px 20px rgba(122, 181, 29, 0.18);
+    }
+
+    .branch-card.selected::after {
+      content: '\2713';
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .branch-icon {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .branch-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .branch-desc {
+      font-size: 0.78rem;
+      color: var(--gray-500);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .branch-price {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .branch-price small {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--gray-500);
+    }
+
+    .branch-badge {
+      position: absolute;
+      top: -8px;
+      left: 16px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    /* BOTTOM BAR */
+    .bottom-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--white);
+      border-top: 1px solid var(--gray-100);
+      padding: 20px 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+      z-index: 10;
+    }
+
+    .bottom-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .selection-info {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+    }
+
+    .selection-info strong {
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+
+    .btn-weiter {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 40px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.3);
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-weiter:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-weiter:disabled {
+      background: var(--gray-300);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-weiter .arrow {
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .btn-weiter:hover .arrow { transform: translateX(4px); }
+
+    .btn-zurueck {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+      font-family: var(--font);
+    }
+
+    .btn-zurueck:hover { color: var(--primary); }
+
+    @media (max-width: 600px) {
+      .branch-grid { grid-template-columns: 1fr 1fr; }
+      .main h1 { font-size: 1.6rem; }
+      .bottom-inner { flex-direction: column; gap: 12px; text-align: center; }
+      .btn-zurueck { display: none; }
+    }
+
+    @media (max-width: 420px) {
+      .branch-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+      <a href="index.html" class="header-back">&#8592; Zur Startseite</a>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-section">
+    <div class="progress-inner">
+      <div class="progress-steps">
+        <div class="progress-step">
+          <div class="step-circle active">1</div>
+          <span class="step-label active">Branche</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">2</div>
+          <span class="step-label">Menge</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">3</div>
+          <span class="step-label">Konto erstellen</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">4</div>
+          <span class="step-label">Bezahlen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>In welchen Bereichen willst du <span>wachsen</span>?</h1>
+    <p class="main-subtitle">Wähle eine oder mehrere Branchen aus — wir liefern dir die passenden Leads.</p>
+    <div class="main-hint">&#10024; Mehrfachauswahl möglich — kombiniere Branchen nach Bedarf</div>
+
+    <!-- ENERGIE -->
+    <div class="category-section">
+      <div class="category-label">&#9889; Energie &amp; Haustechnik</div>
+      <div class="branch-grid">
+        <div class="branch-card" onclick="toggleCard(this)">
+          <span class="branch-badge">Bestseller</span>
+          <div class="branch-icon">&#128161;</div>
+          <div class="branch-name">Strom &amp; Gas</div>
+          <div class="branch-desc">Wechselwillige Haushalte mit echtem Interesse an besseren Tarifen.</div>
+          <div class="branch-price">ab 19,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#127807;</div>
+          <div class="branch-name">Energieberatung</div>
+          <div class="branch-desc">Eigenheimbesitzer, die aktiv nach Energieberatung suchen.</div>
+          <div class="branch-price">ab 24,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <span class="branch-badge">Beliebt</span>
+          <div class="branch-icon">&#9728;&#65039;</div>
+          <div class="branch-name">Photovoltaik</div>
+          <div class="branch-desc">Hausbesitzer mit Dachfläche und konkretem Solar-Interesse.</div>
+          <div class="branch-price">ab 49,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#127777;&#65039;</div>
+          <div class="branch-name">Wärmepumpe</div>
+          <div class="branch-desc">Eigentümer, die ihre Heizung modernisieren möchten.</div>
+          <div class="branch-price">ab 49,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAUS & SICHERHEIT -->
+    <div class="category-section">
+      <div class="category-label">&#127968; Haus &amp; Sicherheit</div>
+      <div class="branch-grid">
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#128999;</div>
+          <div class="branch-name">Fenster</div>
+          <div class="branch-desc">Eigenheimbesitzer mit konkretem Renovierungsbedarf.</div>
+          <div class="branch-price">ab 39,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#127966;&#65039;</div>
+          <div class="branch-name">Dachfenster</div>
+          <div class="branch-desc">Hausbesitzer, die Dachgeschoss ausbauen oder sanieren.</div>
+          <div class="branch-price">ab 39,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#128682;</div>
+          <div class="branch-name">Haustüren</div>
+          <div class="branch-desc">Eigentümer, die Sicherheit und Optik verbessern wollen.</div>
+          <div class="branch-price">ab 39,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <span class="branch-badge">Beliebt</span>
+          <div class="branch-icon">&#128275;</div>
+          <div class="branch-name">Alarmanlagen</div>
+          <div class="branch-desc">Haus- und Wohnungsbesitzer mit Sicherheitsbedarf.</div>
+          <div class="branch-price">ab 39,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#128249;</div>
+          <div class="branch-name">Videoüberwachung</div>
+          <div class="branch-desc">Privat- und Gewerbekunden, die ihr Objekt schützen wollen.</div>
+          <div class="branch-price">ab 39,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDING -->
+    <div class="category-section">
+      <div class="category-label">&#9749; Vending &amp; Automaten</div>
+      <div class="branch-grid">
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#9749;</div>
+          <div class="branch-name">Kaffeevollautomat</div>
+          <div class="branch-desc">Unternehmen mit Bedarf an professionellen Kaffeelösungen.</div>
+          <div class="branch-price">ab 59,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#128167;</div>
+          <div class="branch-name">Wasserspender</div>
+          <div class="branch-desc">Büros und Betriebe, die frisches Wasser für Mitarbeiter suchen.</div>
+          <div class="branch-price">ab 59,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#127852;</div>
+          <div class="branch-name">Snackautomat</div>
+          <div class="branch-desc">Standortbetreiber mit Interesse an Vending-Lösungen.</div>
+          <div class="branch-price">ab 59,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMMOBILIEN & SENIOREN -->
+    <div class="category-section">
+      <div class="category-label">&#127970; Immobilien &amp; Mobilität</div>
+      <div class="branch-grid">
+        <div class="branch-card" onclick="toggleCard(this)">
+          <div class="branch-icon">&#128714;</div>
+          <div class="branch-name">Treppenlift</div>
+          <div class="branch-desc">Senioren oder Angehörige mit akutem Bedarf an Mobilität.</div>
+          <div class="branch-price">ab 119,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+        <div class="branch-card" onclick="toggleCard(this)">
+          <span class="branch-badge">Premium</span>
+          <div class="branch-icon">&#127968;</div>
+          <div class="branch-name">Immobilien</div>
+          <div class="branch-desc">Eigentümer mit konkreter Verkaufs- oder Bewertungsabsicht.</div>
+          <div class="branch-price">ab 149,90&nbsp;&#8364; <small>/ Lead</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <button class="btn-zurueck" onclick="window.location.href='bestellen.html'">&#8592; Zurück</button>
+      <div class="selection-info">
+        <strong id="count">0</strong> Branche(n) ausgewählt
+      </div>
+      <button class="btn-weiter" id="btnWeiter" disabled>
+        Weiter <span class="arrow">&#8594;</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    var branchKeys = {
+      'Strom & Gas': 'strom-gas',
+      'Energieberatung': 'energieberatung',
+      'Photovoltaik': 'photovoltaik',
+      'Wärmepumpe': 'waermepumpe',
+      'Fenster': 'fenster',
+      'Dachfenster': 'dachfenster',
+      'Haustüren': 'haustueren',
+      'Alarmanlagen': 'alarmanlagen',
+      'Videoüberwachung': 'videoueberwachung',
+      'Kaffeevollautomat': 'kaffeevollautomat',
+      'Wasserspender': 'wasserspender',
+      'Snackautomat': 'snackautomat',
+      'Treppenlift': 'treppenlift',
+      'Immobilien': 'immobilien'
+    };
+
+    function toggleCard(card) {
+      card.classList.toggle('selected');
+      updateCount();
+    }
+
+    function updateCount() {
+      var count = document.querySelectorAll('.branch-card.selected').length;
+      document.getElementById('count').textContent = count;
+      document.getElementById('btnWeiter').disabled = count === 0;
+    }
+
+    document.getElementById('btnWeiter').addEventListener('click', function() {
+      if (this.disabled) return;
+      var selected = [];
+      document.querySelectorAll('.branch-card.selected').forEach(function(card) {
+        var name = card.querySelector('.branch-name').textContent.trim();
+        if (branchKeys[name]) selected.push(branchKeys[name]);
+      });
+      localStorage.setItem('leadarea_branches', JSON.stringify(selected));
+      window.location.href = 'menge.html';
+    });
+  </script>
+
+</body>
+</html>

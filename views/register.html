@@ -1,0 +1,117 @@
+<section class="dark-area" style="padding: 60px 0;">
+  <div class="container">
+    <div class="form-card">
+      <h2>Kostenlos registrieren</h2>
+      {{alertHtml}}
+      <form method="POST" action="/register">
+        <div class="form-group">
+          <label for="company">Firmenname *</label>
+          <input type="text" id="company" name="company" placeholder="Musterfirma GmbH" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">Vorname *</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Max" required>
+          </div>
+          <div class="form-group">
+            <label for="last_name">Nachname *</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Mustermann" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">E-Mail *</label>
+          <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Telefonnummer * (für eventuelle Rückfragen)</label>
+          <input type="tel" id="phone" name="phone" placeholder="+49 123 456789" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:3;">
+            <label for="street">Straße *</label>
+            <input type="text" id="street" name="street" placeholder="Musterstraße" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="house_number">Hausnr. *</label>
+            <input type="text" id="house_number" name="house_number" placeholder="1a" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="postal_code">PLZ *</label>
+            <input type="text" id="postal_code" name="postal_code" placeholder="12345" required>
+          </div>
+          <div class="form-group" style="flex:3;">
+            <label for="city">Ort *</label>
+            <input type="text" id="city" name="city" placeholder="Musterstadt" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="country">Land *</label>
+          <select id="country" name="country" required>
+            <option value="DE" selected>Deutschland</option>
+            <option value="AT">Österreich</option>
+            <option value="CH">Schweiz</option>
+            <option value="BE">Belgien</option>
+            <option value="BG">Bulgarien</option>
+            <option value="DK">Dänemark</option>
+            <option value="EE">Estland</option>
+            <option value="FI">Finnland</option>
+            <option value="FR">Frankreich</option>
+            <option value="GR">Griechenland</option>
+            <option value="IE">Irland</option>
+            <option value="IS">Island</option>
+            <option value="IT">Italien</option>
+            <option value="HR">Kroatien</option>
+            <option value="LV">Lettland</option>
+            <option value="LI">Liechtenstein</option>
+            <option value="LT">Litauen</option>
+            <option value="LU">Luxemburg</option>
+            <option value="MT">Malta</option>
+            <option value="NL">Niederlande</option>
+            <option value="NO">Norwegen</option>
+            <option value="PL">Polen</option>
+            <option value="PT">Portugal</option>
+            <option value="RO">Rumänien</option>
+            <option value="SE">Schweden</option>
+            <option value="SK">Slowakei</option>
+            <option value="SI">Slowenien</option>
+            <option value="ES">Spanien</option>
+            <option value="CZ">Tschechien</option>
+            <option value="HU">Ungarn</option>
+            <option value="GB">Vereinigtes Königreich</option>
+            <option value="CY">Zypern</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="password">Passwort * (min. 6 Zeichen)</label>
+          <input type="password" id="password" name="password" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label for="password2">Passwort wiederholen *</label>
+          <input type="password" id="password2" name="password2" minlength="6" required>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="b2b" name="b2b" required>
+          <label for="b2b">Ich bestelle als Unternehmer im Rahmen meiner gewerblichen oder selbstständigen beruflichen Tätigkeit (§ 14 BGB). *</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="dsgvo" name="dsgvo" required>
+          <label for="dsgvo">Ich stimme der Verarbeitung meiner Daten gemäß der <a href="/datenschutz" target="_blank" style="color:var(--primary);">Datenschutzerklärung</a> zu.</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="agb" name="agb" required>
+          <label for="agb">Ich akzeptiere die <a href="/agb" target="_blank" style="color:var(--primary);">AGB</a>. *</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="newsletter" name="newsletter">
+          <label for="newsletter">Ich möchte den Newsletter mit Angeboten und Neuigkeiten erhalten (freiwillig, jederzeit widerrufbar).</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Registrieren</button>
+      </form>
+      <p style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--gray-500);">
+        Bereits ein Konto? <a href="/login" style="color:var(--primary); font-weight:600;">Jetzt einloggen</a>
+      </p>
+    </div>
+  </div>
+</section>

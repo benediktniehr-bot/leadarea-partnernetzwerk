@@ -1,0 +1,150 @@
+<section class="partner-hero">
+  <div class="container">
+    <h1 class="shine-text">Partner-LeadArea</h1>
+    <p>Seit über 12 Jahren am Markt – mit Auftraggebern, die uns teils seit mehr als 10 Jahren vertrauen. Werde Teil unseres Netzwerks und profitiere von langjährigen Kooperationen und unserem Know-how.</p>
+    {{alertHtml}}
+  </div>
+</section>
+
+<section class="marketplace-products partner-projects">
+  <div class="container">
+    <h2 class="section-title">Für welche Projekte möchtest du mit uns zusammenarbeiten?</h2>
+    <p class="section-subtitle">Wähle eine oder mehrere Branchen aus, die zu dir passen – so können wir dich optimal einem unserer Projekte zuordnen.</p>
+    {{projectTilesHtml}}
+    <p id="projectTilesError" class="alert alert-error" style="display:none;margin-top:20px;">Bitte wähle mindestens ein Projekt aus, das zu dir passt.</p>
+  </div>
+</section>
+
+<section class="partner-section" id="bewerbung">
+  <div class="container partner-inner">
+    <div class="partner-content">
+      <h2>Werde Teil unseres Netzwerks.</h2>
+      <p>Nach deiner Bewerbung vereinbaren wir gerne ein persönliches Gespräch, um uns kennenzulernen und alle Details in Ruhe zu besprechen.</p>
+      <ul class="partner-benefits">
+        <li><span class="check">&#10003;</span> Über 12 Jahre Erfahrung am Markt</li>
+        <li><span class="check">&#10003;</span> Langjährige, verlässliche Kooperationen</li>
+        <li><span class="check">&#10003;</span> Großes Netzwerk &amp; Know-how</li>
+      </ul>
+    </div>
+    <div class="partner-form">
+      <h3>Jetzt bewerben</h3>
+      <form method="POST" action="/partner" id="partnerForm">
+        <div class="form-group">
+          <label for="company">Firmenname *</label>
+          <input type="text" id="company" name="company" placeholder="Firmenname" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">Vorname (Ansprechpartner) *</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Vorname" required>
+          </div>
+          <div class="form-group">
+            <label for="last_name">Nachname (Ansprechpartner) *</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Nachname" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="street">Straße *</label>
+            <input type="text" id="street" name="street" placeholder="Straße" required>
+          </div>
+          <div class="form-group">
+            <label for="house_number">Hausnummer *</label>
+            <input type="text" id="house_number" name="house_number" placeholder="Nr." required style="max-width:120px;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="postal_code">PLZ *</label>
+            <input type="text" id="postal_code" name="postal_code" placeholder="PLZ" required style="max-width:120px;">
+          </div>
+          <div class="form-group">
+            <label for="city">Ort *</label>
+            <input type="text" id="city" name="city" placeholder="Ort" required>
+          </div>
+          <div class="form-group">
+            <label for="country">Land *</label>
+            <select id="country" name="country" required>
+              <option value="DE" selected>Deutschland</option>
+              <option value="TR">Türkei</option>
+              <option value="GR">Griechenland</option>
+              <option value="XK">Kosovo</option>
+              <option value="RS">Serbien</option>
+              <option value="BA">Bosnien und Herzegowina</option>
+              <option value="HR">Kroatien</option>
+              <option value="ME">Montenegro</option>
+              <option value="MK">Nordmazedonien</option>
+              <option value="AL">Albanien</option>
+              <option value="BG">Bulgarien</option>
+              <option value="RO">Rumänien</option>
+              <option value="HU">Ungarn</option>
+              <option value="PL">Polen</option>
+              <option value="CZ">Tschechien</option>
+              <option value="SK">Slowakei</option>
+              <option value="SI">Slowenien</option>
+              <option value="UA">Ukraine</option>
+              <option value="RU">Russland</option>
+              <option value="MD">Moldau</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Telefonnummer *</label>
+            <input type="tel" id="phone" name="phone" placeholder="Telefonnummer" required>
+          </div>
+          <div class="form-group">
+            <label for="email">E-Mail *</label>
+            <input type="email" id="email" name="email" placeholder="E-Mail-Adresse" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tax_number">Steuernummer</label>
+          <input type="text" id="tax_number" name="tax_number" placeholder="Steuernummer (optional)">
+        </div>
+        <div class="form-group">
+          <label>Terminwunsch für ein Gespräch *</label>
+          <div style="display:flex;gap:10px;">
+            <input type="date" id="appointment_date" name="appointment_date" required style="flex:1;">
+            <input type="time" id="appointment_time" name="appointment_time" required style="flex:1;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Erzähle uns etwas über dich</label>
+          <textarea id="message" name="message" placeholder="Wie viele Agents hast du? Welche Erfahrung bringst du mit?"></textarea>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="dsgvo" name="dsgvo" required>
+          <label for="dsgvo">Ich stimme der Verarbeitung meiner Daten gemäß der <a href="/datenschutz" target="_blank" style="color:var(--primary);">Datenschutzerklärung</a> zu.</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="agb" name="agb" required>
+          <label for="agb">Ich akzeptiere die <a href="#" style="color:var(--primary);">AGB</a>. *</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="newsletter" name="newsletter">
+          <label for="newsletter">Ich möchte den Newsletter mit Angeboten und Neuigkeiten erhalten (freiwillig, jederzeit widerrufbar).</label>
+        </div>
+        <button type="submit" class="btn btn-accent btn-block">Bewerbung absenden</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+var projectTilesError = document.getElementById('projectTilesError');
+document.querySelectorAll('.project-tile input[type=checkbox]').forEach(function (cb) {
+  cb.addEventListener('change', function () {
+    cb.closest('.project-tile').classList.toggle('selected', cb.checked);
+    if (cb.checked) projectTilesError.style.display = 'none';
+  });
+});
+document.getElementById('partnerForm').addEventListener('submit', function (e) {
+  var anyChecked = document.querySelectorAll('.project-tile input[type=checkbox]:checked').length > 0;
+  if (!anyChecked) {
+    e.preventDefault();
+    projectTilesError.style.display = 'block';
+    projectTilesError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+</script>

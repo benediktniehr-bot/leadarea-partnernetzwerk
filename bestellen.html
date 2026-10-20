@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Jetzt Leads bestellen</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.08);
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      color: var(--gray-900);
+      line-height: 1.7;
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* HEADER */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-img { height: 70px; width: auto; }
+
+    .header-back {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .header-back:hover { color: var(--primary); }
+
+    /* PROGRESS */
+    .progress-section {
+      background: var(--gray-50);
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .progress-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: var(--gray-200, #e2e8f0);
+      border-radius: 2px;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .step-circle.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(122, 181, 29, 0.35);
+    }
+
+    .step-circle.inactive {
+      background: var(--white);
+      color: var(--gray-500);
+      border: 2px solid var(--gray-300);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-align: center;
+    }
+
+    .step-label.active { color: var(--primary-dark); }
+
+    /* MAIN CONTENT */
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .main h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.2;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .main h1 span { color: var(--primary); }
+
+    .main-subtitle {
+      font-size: 1.1rem;
+      color: var(--gray-500);
+      text-align: center;
+      margin-bottom: 48px;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* BENEFITS CARDS */
+    .benefits {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .benefit-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: all 0.25s ease;
+    }
+
+    .benefit-card:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(122, 181, 29, 0.1);
+    }
+
+    .benefit-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .benefit-text h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .benefit-text p {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    /* CTA AREA */
+    .cta-area {
+      background: linear-gradient(135deg, #f7f9f3 0%, #eef5e0 100%);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .cta-area h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .cta-area p {
+      font-size: 0.95rem;
+      color: var(--gray-500);
+      margin-bottom: 32px;
+    }
+
+    .btn-bestellen {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 48px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.35);
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-bestellen:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 8px 32px rgba(122, 181, 29, 0.45);
+      transform: translateY(-3px);
+    }
+
+    .btn-bestellen .arrow {
+      font-size: 1.3rem;
+      transition: transform 0.2s;
+    }
+
+    .btn-bestellen:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .cta-note {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+
+    /* TRUST ROW */
+    .trust-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    .trust-badge .icon {
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    /* FOOTER MINI */
+    .footer-mini {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--gray-100);
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--gray-500);
+    }
+
+    .footer-mini a {
+      color: var(--gray-500);
+      margin: 0 12px;
+      transition: color 0.2s;
+    }
+
+    .footer-mini a:hover { color: var(--primary); }
+
+    @media (max-width: 600px) {
+      .benefits { grid-template-columns: 1fr; }
+      .main h1 { font-size: 1.8rem; }
+      .cta-area { padding: 36px 24px; }
+      .progress-steps::before { left: 20px; right: 20px; }
+      .step-label { font-size: 0.65rem; }
+      .trust-row { gap: 16px; flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+      <a href="index.html" class="header-back">&#8592; Zur Startseite</a>
+    </div>
+  </div>
+
+  <!-- PROGRESS STEPS -->
+  <div class="progress-section">
+    <div class="progress-inner">
+      <div class="progress-steps">
+        <div class="progress-step">
+          <div class="step-circle active">1</div>
+          <span class="step-label active">Branche</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">2</div>
+          <span class="step-label">Menge</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">3</div>
+          <span class="step-label">Konto erstellen</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">4</div>
+          <span class="step-label">Bezahlen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <h1>Deine Leads. <span>Dein Tempo.</span></h1>
+    <p class="main-subtitle">Wähle deine Branche, bestimme die Menge und starte sofort. Kein Vertrag, kein Risiko, kein Warten.</p>
+
+    <div class="benefits">
+      <div class="benefit-card">
+        <div class="benefit-icon">&#127919;</div>
+        <div class="benefit-text">
+          <h3>Bereits ab 1 Lead</h3>
+          <p>Keine Mindestabnahme. Bestelle genau so viele, wie du brauchst.</p>
+        </div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">&#128737;</div>
+        <div class="benefit-text">
+          <h3>Qualitätsgarantie</h3>
+          <p>Nicht zufrieden? 14 Tage kostenlose Reklamation für jeden Lead.</p>
+        </div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">&#128203;</div>
+        <div class="benefit-text">
+          <h3>Keine Vertragsbindung</h3>
+          <p>Kein Abo, keine Mindestlaufzeit. Volle Flexibilität bei jeder Bestellung.</p>
+        </div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">&#9889;</div>
+        <div class="benefit-text">
+          <h3>Schnelle Lieferung</h3>
+          <p>Erste Leads innerhalb weniger Tage direkt in deinem Konto.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-area">
+      <h2>Bereit? Wähle jetzt deine Branche.</h2>
+      <p>14 Branchen verfügbar — von Energie über Sicherheit bis Immobilien.</p>
+      <a href="branchen.html" class="btn-bestellen">
+        Branche wählen <span class="arrow">&#8594;</span>
+      </a>
+      <div class="cta-note">Kostenlose Registrierung in unter 2 Minuten</div>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-badge"><span class="icon">&#9878;</span> DSGVO-konform</div>
+      <div class="trust-badge"><span class="icon">&#10003;</span> Inhouse-Qualifizierung</div>
+      <div class="trust-badge"><span class="icon">&#128100;</span> Persönlicher Ansprechpartner</div>
+    </div>
+
+    <div class="footer-mini">
+      <a href="index.html">Startseite</a>
+      <a href="#">Impressum</a>
+      <a href="#">Datenschutz</a>
+      <a href="#">AGB</a>
+      <br><br>
+      &copy; 2025 LeadArea. Alle Rechte vorbehalten.
+    </div>
+  </div>
+
+</body>
+</html>

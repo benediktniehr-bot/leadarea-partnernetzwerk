@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Bestellung bestätigt!</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.08);
+      --dark: #0f172a;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      color: #1e293b;
+      line-height: 1.7;
+      background: var(--gray-50);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-img { height: 70px; width: auto; }
+
+    .main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+      text-align: center;
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      font-size: 3rem;
+      color: var(--white);
+      box-shadow: 0 8px 32px rgba(122, 181, 29, 0.3);
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    .main h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 12px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .main h1 span { color: var(--primary); }
+
+    .main-subtitle {
+      font-size: 1.1rem;
+      color: var(--gray-500);
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease-out 0.35s both;
+    }
+
+    .confirm-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      text-align: left;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .confirm-card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .next-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .next-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .next-step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      border: 2px solid var(--primary);
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .next-step-text h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .next-step-text p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    .personal-box {
+      background: linear-gradient(135deg, #f7f9f3, #eef5e0);
+      border: 1px solid rgba(122, 181, 29, 0.2);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      text-align: left;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease-out 0.65s both;
+    }
+
+    .personal-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .personal-text h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .personal-text p {
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      line-height: 1.5;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s ease-out 0.8s both;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+      transition: all 0.25s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.4);
+    }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--gray-700);
+      border: 2px solid var(--gray-100);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .footer-mini {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--gray-100);
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      animation: fadeInUp 0.6s ease-out 0.9s both;
+    }
+
+    @media (max-width: 600px) {
+      .main h1 { font-size: 1.7rem; }
+      .personal-box { flex-direction: column; text-align: center; }
+      .cta-buttons { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="success-icon">&#10003;</div>
+    <h1>Willkommen bei <span>LeadArea</span>!</h1>
+    <p class="main-subtitle">Deine Bestellung ist eingegangen und wird bearbeitet. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
+
+    <div class="confirm-card">
+      <h2>&#128640; So geht es jetzt weiter</h2>
+      <ul class="next-steps">
+        <li class="next-step">
+          <div class="next-step-num">1</div>
+          <div class="next-step-text">
+            <h3>E-Mail bestätigen</h3>
+            <p>Prüfe deinen Posteingang und bestätige deine E-Mail-Adresse über den Link in unserer Nachricht.</p>
+          </div>
+        </li>
+        <li class="next-step">
+          <div class="next-step-num">2</div>
+          <div class="next-step-text">
+            <h3>Persönlicher Kontakt</h3>
+            <p>Dein Ansprechpartner meldet sich bei dir, um deine Anforderungen zu besprechen und sicherzustellen, dass die Leads perfekt zu deinem Geschäft passen.</p>
+          </div>
+        </li>
+        <li class="next-step">
+          <div class="next-step-num">3</div>
+          <div class="next-step-text">
+            <h3>Leads erhalten</h3>
+            <p>Deine qualifizierten Leads werden direkt in dein LeadArea-Konto geliefert — schnell, zuverlässig und DSGVO-konform.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="personal-box">
+      <div class="personal-avatar">JK</div>
+      <div class="personal-text">
+        <h3>Dein persönlicher Ansprechpartner</h3>
+        <p>Ich melde mich innerhalb von 24 Stunden persönlich bei dir. Bis dahin: Lehn dich zurück — wir kümmern uns um alles.</p>
+      </div>
+    </div>
+
+    <div class="cta-buttons">
+      <a href="#" class="btn btn-primary">Zum Dashboard</a>
+      <a href="index.html" class="btn btn-outline">Zurück zur Startseite</a>
+    </div>
+
+    <div class="footer-mini">
+      Fragen? Schreib uns an <a href="mailto:info@dmp-performance.de" style="color: var(--primary);">info@dmp-performance.de</a>
+      <br><br>
+      &copy; 2025 LeadArea – Ein Projekt von dmp performance. Alle Rechte vorbehalten.
+    </div>
+  </div>
+
+</body>
+</html>

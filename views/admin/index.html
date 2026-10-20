@@ -1,0 +1,29 @@
+<section style="background:var(--gray-50); padding-top:40px;">
+  <div class="container">
+    <div class="dashboard-layout">
+      <div class="sidebar">
+        <h3>Admin</h3>
+        <ul class="sidebar-nav">
+          <li><a href="/admin" class="{{activeOverview}}">Übersicht</a></li>
+          <li><a href="/admin/products" class="{{activeProducts}}">Produkte</a></li>
+          <li><a href="/admin/orders" class="{{activeOrders}}">Bestellungen</a></li>
+          <li><a href="/admin/users" class="{{activeUsers}}">Nutzer</a></li>
+          <li><a href="/admin/leads" class="{{activeAdminLeads}}">Leads verwalten</a></li>
+          <li><a href="/admin/reclamations" class="{{activeReclamations}}">Reklamationen</a></li>
+          <li><a href="/admin/partners" class="{{activePartners}}">Partner-Bewerbungen</a></li>
+          <li style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-300);"><a href="/admin/pool" class="{{activePool}}">Lead-Pool</a></li>
+          <li><a href="/admin/pool/search" class="{{activePool}}">Lead-Suche</a></li>
+          <li><a href="/admin/pool/import" class="{{activeImport}}">Pool-Import</a></li>
+          <li><a href="/admin/pool/assignments" class="{{activeAssignments}}">Zuweisungen</a></li>
+          <li><a href="/admin/provisionen" class="{{activeProvisionen}}">Lead-Reporting</a></li>
+          <li style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-300);"><a href="/admin/blacklist" class="{{activeBlacklist}}">Blacklist</a></li>
+          <li><a href="/admin/widerruf" class="{{activeWiderruf}}" style="color:var(--error);">Widerruf / Opt-out</a></li>
+          <li><a href="/dashboard">Zum Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="dashboard-content">
+        {{adminContent}}
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Konto erstellen</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.08);
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      color: var(--gray-900);
+      line-height: 1.7;
+      background: var(--gray-50);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-img { height: 70px; width: auto; }
+
+    .header-back {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .header-back:hover { color: var(--primary); }
+
+    .progress-section {
+      background: var(--white);
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .progress-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .step-circle.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(122, 181, 29, 0.35);
+    }
+
+    .step-circle.done {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .step-circle.inactive {
+      background: var(--white);
+      color: var(--gray-500);
+      border: 2px solid var(--gray-300);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .step-label.active { color: var(--primary-dark); }
+    .step-label.done { color: var(--primary); }
+
+    /* MAIN */
+    .main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .main h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .main h1 span { color: var(--primary); }
+
+    .main-subtitle {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 1rem;
+      margin-bottom: 40px;
+    }
+
+    /* TWO COLUMN LAYOUT */
+    .register-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* FORM */
+    .form-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+
+    .form-card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .form-card .form-intro {
+      font-size: 0.88rem;
+      color: var(--gray-500);
+      margin-bottom: 28px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid var(--gray-100);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: var(--font);
+      color: var(--dark);
+      background: var(--gray-50);
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(122, 181, 29, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: var(--gray-300);
+    }
+
+    .form-divider {
+      height: 1px;
+      background: var(--gray-100);
+      margin: 8px 0 24px;
+    }
+
+    .form-section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .form-check input[type="checkbox"] {
+      margin-top: 4px;
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .form-check label {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    .form-check label a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.3);
+      transition: all 0.25s ease;
+      font-family: var(--font);
+      margin-top: 8px;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .form-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--gray-300);
+      margin-top: 12px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ORDER SUMMARY */
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .summary-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.85rem;
+    }
+
+    .summary-item:last-child { border-bottom: none; }
+
+    .summary-item-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .summary-item-qty {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .summary-edit {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      transition: color 0.2s;
+    }
+
+    .summary-edit:hover { color: var(--primary); }
+
+    /* TRUST CARD */
+    .trust-card {
+      background: linear-gradient(135deg, #f7f9f3, #eef5e0);
+      border: 1px solid rgba(122, 181, 29, 0.15);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .trust-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 16px;
+    }
+
+    .trust-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .trust-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      line-height: 1.5;
+    }
+
+    .trust-list .icon {
+      color: var(--primary);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* PERSONAL CARD */
+    .personal-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .personal-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 0 auto 12px;
+    }
+
+    .personal-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .personal-card .role {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-bottom: 12px;
+    }
+
+    .personal-card .quote {
+      font-size: 0.82rem;
+      color: var(--gray-700);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* BACK BUTTON */
+    .back-row {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .btn-zurueck {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: color 0.2s;
+    }
+
+    .btn-zurueck:hover { color: var(--primary); }
+
+    @media (max-width: 768px) {
+      .register-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar { order: -1; }
+      .form-row { grid-template-columns: 1fr; }
+      .main h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+      <a href="index.html" class="header-back">&#8592; Zur Startseite</a>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-section">
+    <div class="progress-inner">
+      <div class="progress-steps">
+        <div class="progress-step">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Branche</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Menge</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle active">3</div>
+          <span class="step-label active">Konto erstellen</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle inactive">4</div>
+          <span class="step-label">Bezahlen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>Fast geschafft — willkommen bei <span>LeadArea</span></h1>
+    <p class="main-subtitle">Erstelle dein kostenloses Konto und starte in wenigen Minuten mit deinen ersten Leads.</p>
+
+    <div class="register-layout">
+
+      <!-- FORM -->
+      <div class="form-card">
+        <h2>Dein Konto einrichten</h2>
+        <p class="form-intro">Keine versteckten Kosten. Kein Abo. Du zahlst nur, was du bestellst.</p>
+
+        <div class="form-section-label">Persönliche Daten</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vorname">Vorname *</label>
+            <input type="text" id="vorname" placeholder="Max">
+          </div>
+          <div class="form-group">
+            <label for="nachname">Nachname *</label>
+            <input type="text" id="nachname" placeholder="Mustermann">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="firma">Firma</label>
+          <input type="text" id="firma" placeholder="Dein Unternehmen (optional)">
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="form-section-label">Kontaktdaten</div>
+
+        <div class="form-group">
+          <label for="email">E-Mail-Adresse *</label>
+          <input type="email" id="email" placeholder="max@deinefirma.de">
+        </div>
+
+        <div class="form-group">
+          <label for="telefon">Telefonnummer *</label>
+          <input type="tel" id="telefon" placeholder="+49 170 1234567">
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="form-section-label">Zugangsdaten</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="passwort">Passwort *</label>
+            <input type="password" id="passwort" placeholder="Min. 8 Zeichen">
+          </div>
+          <div class="form-group">
+            <label for="passwort2">Passwort wiederholen *</label>
+            <input type="password" id="passwort2" placeholder="Passwort bestätigen">
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="form-check">
+          <input type="checkbox" id="agb">
+          <label for="agb">Ich akzeptiere die <a href="#">Allgemeinen Geschäftsbedingungen</a> und habe die <a href="#">Datenschutzerklärung</a> gelesen.</label>
+        </div>
+
+        <div class="form-check">
+          <input type="checkbox" id="newsletter" checked>
+          <label for="newsletter">Ja, ich möchte gelegentlich über neue Branchen und Sonderaktionen informiert werden. (Jederzeit abbestellbar)</label>
+        </div>
+
+        <button class="btn-submit" onclick="window.location.href='bezahlen.html'">Konto erstellen &amp; weiter zur Bezahlung</button>
+        <p class="form-note">&#128274; Deine Daten werden verschlüsselt übertragen und DSGVO-konform gespeichert.</p>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- ORDER SUMMARY -->
+        <div class="summary-card">
+          <h3>&#128203; Deine Bestellung</h3>
+          <div id="summaryItems">
+            <div class="summary-item">
+              <span class="summary-item-name">&#9728;&#65039; Photovoltaik</span>
+              <span class="summary-item-qty">25–50 Leads</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-item-name">&#128161; Strom &amp; Gas</span>
+              <span class="summary-item-qty">10–25 Leads</span>
+            </div>
+          </div>
+          <a href="branchen.html" class="summary-edit">&#9998; Auswahl ändern</a>
+        </div>
+
+        <!-- PERSONAL CARD -->
+        <div class="personal-card">
+          <div class="personal-avatar">JK</div>
+          <h4>Dein persönlicher Ansprechpartner</h4>
+          <div class="role">Kundenbetreuung LeadArea</div>
+          <p class="quote">&bdquo;Nach deiner Registrierung melde ich mich persönlich bei dir. Gemeinsam stellen wir sicher, dass du genau die Leads bekommst, die zu deinem Geschäft passen.&ldquo;</p>
+        </div>
+
+        <!-- TRUST CARD -->
+        <div class="trust-card">
+          <h3>&#128170; Darum LeadArea</h3>
+          <ul class="trust-list">
+            <li><span class="icon">&#10003;</span> Kostenlose Registrierung — du zahlst erst bei der Bestellung</li>
+            <li><span class="icon">&#10003;</span> Kein Abo, keine Mindestlaufzeit, kein Risiko</li>
+            <li><span class="icon">&#10003;</span> 14 Tage Reklamationsrecht auf jeden Lead</li>
+            <li><span class="icon">&#10003;</span> Persönlicher Ansprechpartner statt anonymem Portal</li>
+            <li><span class="icon">&#10003;</span> DSGVO-konform — dokumentierte Einwilligung pro Lead</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="back-row">
+      <button class="btn-zurueck" onclick="window.location.href='menge.html'">&#8592; Zurück zur Mengenauswahl</button>
+    </div>
+  </div>
+
+</body>
+</html>

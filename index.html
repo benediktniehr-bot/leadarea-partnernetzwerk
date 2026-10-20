@@ -1,0 +1,2089 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadArea – Der erste Marktplatz für qualifizierte Leads</title>
+  <style>
+    :root {
+      --primary: #7ab51d;
+      --primary-dark: #5a8c0f;
+      --primary-light: rgba(122, 181, 29, 0.1);
+      --accent: #333333;
+      --accent-dark: #1a1a1a;
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --warm-bg: #fafaf7;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ANIMATIONS */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(122, 181, 29, 0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(122, 181, 29, 0); }
+    }
+
+    .animate { opacity: 0; }
+    .animate.visible { animation-duration: 0.7s; animation-fill-mode: both; animation-timing-function: ease-out; }
+    .animate.visible.fade-up { animation-name: fadeInUp; }
+    .animate.visible.fade-left { animation-name: fadeInLeft; }
+    .animate.visible.fade-right { animation-name: fadeInRight; }
+
+    body {
+      font-family: var(--font);
+      color: var(--gray-900);
+      line-height: 1.7;
+      background: var(--warm-bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    a { text-decoration: none; color: inherit; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      height: 70px;
+      width: auto;
+    }
+
+    nav { display: flex; align-items: center; gap: 32px; }
+
+    nav a {
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--primary); }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 6px 24px rgba(122, 181, 29, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-cta-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .btn-accent:hover { background: var(--accent-dark); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-sm { padding: 8px 20px; font-size: 0.85rem; }
+
+    /* MOBILE NAV */
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-700);
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      nav.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        gap: 16px;
+      }
+      .mobile-toggle { display: block; }
+    }
+
+    /* HERO */
+    .hero {
+      padding: 80px 0;
+      background: linear-gradient(135deg, #f7f9f3 0%, #eef5e0 50%, #f0f4e8 100%);
+    }
+
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .hero-content { flex: 1; }
+
+    .hero-content h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--dark);
+      margin-bottom: 20px;
+    }
+
+    .hero-content h1 span { color: var(--primary); }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--gray-700);
+      margin-bottom: 12px;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--gray-500);
+      margin-bottom: 32px;
+    }
+
+    .hero-features {
+      display: flex;
+      gap: 24px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .hero-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+    }
+
+    .hero-feature .check {
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .hero-image {
+      flex: 1;
+      text-align: center;
+    }
+
+    .hero-dashboard {
+      width: 100%;
+      max-width: 500px;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .dash-header {
+      background: var(--dark);
+      color: var(--white);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .dash-dots { display: flex; gap: 6px; }
+    .dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dash-dot.r { background: #ef4444; }
+    .dash-dot.y { background: #eab308; }
+    .dash-dot.g { background: #22c55e; }
+
+    .dash-body { padding: 20px; }
+
+    .dash-welcome {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+    }
+
+    .dash-welcome strong { color: var(--dark); }
+
+    .dash-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .dash-stat {
+      background: var(--gray-50);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .dash-stat-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .dash-stat-label {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .dash-orders {
+      border-top: 1px solid var(--gray-100);
+      padding-top: 14px;
+    }
+
+    .dash-orders h4 {
+      font-size: 0.8rem;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .dash-order {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.8rem;
+    }
+
+    .dash-order:last-child { border-bottom: none; }
+
+    .dash-order-name { color: var(--dark); font-weight: 600; }
+    .dash-order-count { color: var(--gray-500); }
+
+    .dash-order-status {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .status-delivered {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .status-progress {
+      background: #fef9c3;
+      color: #a16207;
+    }
+
+    /* TRUST BAR */
+    .trust-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 32px 0;
+    }
+
+    .trust-items {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      font-weight: 600;
+    }
+
+    .trust-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+      .hero-inner { flex-direction: column; text-align: center; }
+      .hero-content h1 { font-size: 2rem; }
+      .hero-features { justify-content: center; }
+      .trust-items { gap: 24px; }
+      .dash-stats { grid-template-columns: 1fr; }
+    }
+
+    /* PERSONAL SECTION */
+    .personal { background: var(--white); padding: 80px 0; }
+
+    .personal-inner {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .personal-image {
+      flex: 1;
+    }
+
+    .personal-image img {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    }
+
+    .personal-content {
+      flex: 1;
+    }
+
+    .personal-content h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 16px;
+    }
+
+    .personal-content p {
+      color: var(--gray-500);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .personal-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .personal-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    .personal-list .check {
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      .personal-inner { flex-direction: column; }
+    }
+
+    /* SECTIONS */
+    section { padding: 80px 0; }
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 1.05rem;
+      margin-bottom: 48px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* LEAD CATEGORIES */
+    .categories { background: var(--warm-bg); }
+
+    .category-group {
+      margin-bottom: 48px;
+    }
+
+    .category-group h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .category-group h3 .cat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .cat-icon.energy { background: #fef3c7; }
+    .cat-icon.vending { background: #e0e7ff; }
+    .cat-icon.house { background: #dcfce7; }
+    .cat-icon.immo { background: #fce7f3; }
+
+    .leads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 20px;
+    }
+
+    .lead-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lead-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), #8ecc2e);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .lead-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 32px rgba(122, 181, 29, 0.12);
+      transform: translateY(-4px);
+    }
+
+    .lead-card:hover::before { opacity: 1; }
+
+    .lead-card-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .lead-card h4 {
+      font-size: 1.1rem;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .lead-card-desc {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .lead-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lead-price {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .lead-price small {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--gray-500);
+    }
+
+    .lead-card-link {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary);
+      transition: all 0.2s;
+    }
+
+    .lead-card:hover .lead-card-link { text-decoration: underline; }
+
+    .lead-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    /* 3-STEP PROCESS */
+    .process { background: var(--gray-50); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 40px 24px;
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
+    }
+
+    .step:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+    }
+
+    .step-number {
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin: 0 auto 20px;
+    }
+
+    .step h3 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+
+    .step p {
+      color: var(--gray-500);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      .steps { grid-template-columns: 1fr; }
+    }
+
+    /* COMPARISON TABLES */
+    .comparison { background: var(--white); }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 60px;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.95rem;
+    }
+
+    .compare-table th {
+      background: var(--dark);
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .compare-table th.highlight {
+      background: var(--primary);
+    }
+
+    .compare-table tr:last-child td { border-bottom: none; }
+
+    .compare-table tr:nth-child(even) td { background: var(--gray-50); }
+
+    .compare-table td:first-child {
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    @media (max-width: 768px) {
+      .compare-table { font-size: 0.8rem; }
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+    }
+
+    /* TESTIMONIALS */
+    .testimonials {
+      background: linear-gradient(135deg, #f7f9f3 0%, #eef5e0 100%);
+      padding: 80px 0;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+    }
+
+    .testimonial-stars {
+      color: #f59e0b;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-text {
+      color: var(--gray-700);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testimonial-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .testimonial-name {
+      font-weight: 700;
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+
+    .testimonial-role {
+      color: var(--gray-500);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+      .testimonial-grid { grid-template-columns: 1fr; }
+    }
+
+    /* FAQ */
+    .faq { background: var(--gray-50); }
+
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background: var(--white);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--dark);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font);
+    }
+
+    .faq-question:hover { color: var(--primary); }
+
+    .faq-icon {
+      font-size: 1.3rem;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    .faq-item.active .faq-icon { transform: rotate(45deg); }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .faq-answer-inner {
+      padding: 0 24px 20px;
+      color: var(--gray-500);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 300px;
+    }
+
+    /* PARTNER */
+    .partner {
+      background: linear-gradient(135deg, var(--dark) 0%, #1e3a5f 100%);
+      color: var(--white);
+    }
+
+    .partner-inner {
+      display: flex;
+      gap: 60px;
+      align-items: flex-start;
+    }
+
+    .partner-content { flex: 1; }
+
+    .partner-content h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .partner-content p {
+      color: var(--gray-300);
+      margin-bottom: 24px;
+    }
+
+    .partner-benefits {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .partner-benefits li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+
+    .partner-benefits .check { color: var(--accent); font-size: 1.2rem; }
+
+    .partner-form {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      padding: 36px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .partner-form h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: var(--gray-300);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      color: var(--white);
+      font-size: 0.95rem;
+      font-family: var(--font);
+    }
+
+    .form-group input::placeholder { color: var(--gray-500); }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .form-check input[type="checkbox"] {
+      margin-top: 4px;
+      accent-color: var(--primary);
+    }
+
+    .form-check label {
+      font-size: 0.8rem;
+      color: var(--gray-300);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .partner-inner { flex-direction: column; }
+    }
+
+    /* COMPANY FACTS */
+    .company-facts {
+      background: var(--dark);
+      color: var(--white);
+      padding: 80px 0;
+    }
+
+    .company-facts .section-title { color: var(--white); }
+    .company-facts .section-subtitle { color: var(--gray-300); }
+
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .fact-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .fact-card:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-4px);
+      border-color: var(--primary);
+    }
+
+    .fact-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .fact-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .fact-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .fact-desc {
+      font-size: 0.82rem;
+      color: var(--gray-300);
+      line-height: 1.6;
+    }
+
+    .facts-badges {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .facts-badge {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(122, 181, 29, 0.1);
+      border: 1px solid rgba(122, 181, 29, 0.25);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .facts-badge-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .facts-badge strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .facts-badge span {
+      font-size: 0.8rem;
+      color: var(--gray-300);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .facts-grid { grid-template-columns: 1fr 1fr; }
+      .facts-badges { flex-direction: column; }
+    }
+
+    @media (max-width: 480px) {
+      .facts-grid { grid-template-columns: 1fr; }
+    }
+
+    /* CTA BANNER */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, #4a8c0a 100%);
+      color: var(--white);
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .cta-banner h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 32px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .stat { text-align: center; }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      color: var(--gray-300);
+      padding: 48px 0 24px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand .logo {
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .footer-brand .logo-img {
+      height: 36px;
+    }
+
+    .footer-brand p {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      line-height: 1.6;
+    }
+
+    .footer-col h4 {
+      color: var(--white);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul { list-style: none; }
+
+    .footer-col li { margin-bottom: 8px; }
+
+    .footer-col a {
+      color: var(--gray-500);
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: var(--white); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--gray-500);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .social-links a {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-300);
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .social-links a:hover { background: var(--primary); color: var(--white); }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+
+    /* TEAM SECTION */
+    .team { background: var(--white); padding: 80px 0; }
+
+    .team-inner {
+      display: flex;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .team-story { flex: 1; }
+
+    .team-story .section-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .team-story h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+
+    .team-story p {
+      color: var(--gray-500);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    .team-story .highlight-text {
+      color: var(--gray-700);
+      font-weight: 600;
+      font-size: 1.05rem;
+      border-left: 3px solid var(--primary);
+      padding-left: 16px;
+      margin: 24px 0;
+      line-height: 1.7;
+    }
+
+    .team-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .team-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .team-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+      border-color: var(--primary);
+    }
+
+    .team-photo {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8ecc2e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--white);
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(122, 181, 29, 0.25);
+    }
+
+    .team-photo img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .team-info h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .team-info .team-role {
+      font-size: 0.82rem;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .team-info p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      line-height: 1.6;
+    }
+
+    .team-facts {
+      display: flex;
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .team-fact {
+      text-align: center;
+    }
+
+    .team-fact-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .team-fact-label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .team-inner { flex-direction: column; }
+      .team-facts { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container header-inner">
+      <a href="#" class="logo"><img src="Logo_LeadArea.jpeg" alt="LeadArea" class="logo-img"></a>
+      <button class="mobile-toggle" onclick="document.querySelector('nav').classList.toggle('active')" aria-label="Menu">&#9776;</button>
+      <nav>
+        <a href="#team">Das sind wir</a>
+        <a href="#partner">Partner werden</a>
+        <a href="#categories">Marktplatz</a>
+        <a href="#kontakt">Kontakt</a>
+        <a href="bestellen.html" class="btn btn-primary btn-sm">Registrieren &amp; bestellen</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <h1>Der erste Marktplatz für <span>qualifizierte Leads</span></h1>
+        <p class="hero-subtitle">Warme Leads ab 19,90&nbsp;€. Ohne Vertragslaufzeit, ohne Agentur, ohne Risiko.</p>
+        <p class="hero-desc">LeadArea ist der erste Marktplatz, auf dem du Leads so einfach kaufst wie in einem Online-Shop.</p>
+        <a href="bestellen.html" class="btn btn-primary btn-cta-pulse">Registrieren &amp; bestellen</a>
+        <div class="hero-features">
+          <div class="hero-feature"><span class="check">&#10003;</span> Bestellung ab 1 Lead</div>
+          <div class="hero-feature"><span class="check">&#10003;</span> Schlechte Leads kostenlos reklamieren</div>
+          <div class="hero-feature"><span class="check">&#10003;</span> 14 Branchen verfügbar</div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-dashboard">
+          <div class="dash-header">
+            <div class="dash-dots"><div class="dash-dot r"></div><div class="dash-dot y"></div><div class="dash-dot g"></div></div>
+            <span>LeadArea Dashboard</span>
+          </div>
+          <div class="dash-body">
+            <div class="dash-welcome">Willkommen in deinem <strong>Lead-Portal</strong></div>
+            <div class="dash-stats">
+              <div class="dash-stat">
+                <div class="dash-stat-value" id="statLeads">0</div>
+                <div class="dash-stat-label">Leads erhalten</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-value" id="statReach">0%</div>
+                <div class="dash-stat-label">Erreichbarkeit</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-value" id="statRoi">0x</div>
+                <div class="dash-stat-label">ROI</div>
+              </div>
+            </div>
+            <div class="dash-orders">
+              <h4>Letzte Bestellungen</h4>
+              <div id="dashOrders"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="container">
+      <div class="trust-items">
+        <div class="trust-item">
+          <div class="trust-icon">&#9878;</div>
+          <span>DSGVO-konform</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">&#128197;</div>
+          <span>14+ Jahre Erfahrung</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">&#128100;</div>
+          <span>Persönlicher Ansprechpartner</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">&#10003;</div>
+          <span>Leads reklamierbar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAL TOUCH -->
+  <section class="personal">
+    <div class="container personal-inner">
+      <div class="personal-image animate fade-left">
+        <img src="public/images/callcenteragent.jpg" alt="Persönliche Beratung – DSGVO-konform">
+      </div>
+      <div class="personal-content animate fade-right">
+        <h2>Persönlich. Professionell. DSGVO-konform.</h2>
+        <p>Hinter LeadArea stehen echte Menschen mit über 14 Jahren Erfahrung in der Leadgenerierung. Jeder Lead wird von unserem Team inhouse vorqualifiziert – kein Bot, kein anonymes Portal.</p>
+        <ul class="personal-list">
+          <li><span class="check">&#10003;</span> Persönlicher Ansprechpartner für jede Bestellung</li>
+          <li><span class="check">&#10003;</span> Dokumentierte DSGVO-Einwilligung für jeden Lead</li>
+          <li><span class="check">&#10003;</span> Schnelle und unkomplizierte Reklamation</li>
+          <li><span class="check">&#10003;</span> 14+ Jahre Erfahrung in der Branche</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEAD CATEGORIES -->
+  <section class="categories" id="categories">
+    <div class="container">
+      <h2 class="section-title">Unsere Lead-Kategorien</h2>
+      <p class="section-subtitle">Wähle deine Branche und bestelle Leads direkt – ohne Mindestabnahme.</p>
+
+      <div class="category-group animate fade-up">
+        <h3><span class="cat-icon energy">&#9889;</span> Energie &amp; Haustechnik</h3>
+        <div class="leads-grid">
+          <div class="lead-card">
+            <span class="lead-badge">Bestseller</span>
+            <div class="lead-card-icon">&#128161;</div>
+            <h4>Strom &amp; Gas (Haushalt)</h4>
+            <p class="lead-card-desc">Wechselwillige Haushalte mit echtem Interesse an g&uuml;nstigeren Tarifen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 19,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#127807;</div>
+            <h4>Energieberatung</h4>
+            <p class="lead-card-desc">Eigenheimbesitzer, die aktiv nach Energieberatung suchen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 24,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <span class="lead-badge">Beliebt</span>
+            <div class="lead-card-icon">&#9728;&#65039;</div>
+            <h4>Photovoltaik</h4>
+            <p class="lead-card-desc">Hausbesitzer mit Dachfl&auml;che und konkretem Interesse an Solar.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 49,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#127777;&#65039;</div>
+            <h4>W&auml;rmepumpe</h4>
+            <p class="lead-card-desc">Eigent&uuml;mer, die ihre Heizung modernisieren m&ouml;chten.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 49,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-group animate fade-up">
+        <h3><span class="cat-icon vending">&#9749;</span> Vending &amp; Automaten</h3>
+        <div class="leads-grid">
+          <div class="lead-card">
+            <div class="lead-card-icon">&#9749;</div>
+            <h4>Kaffeevollautomaten</h4>
+            <p class="lead-card-desc">Unternehmen mit Bedarf an professionellen Kaffeel&ouml;sungen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 59,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#127852;</div>
+            <h4>Snackautomaten</h4>
+            <p class="lead-card-desc">Standortbetreiber mit Interesse an Vending-L&ouml;sungen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 59,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#128167;</div>
+            <h4>Wasserspender</h4>
+            <p class="lead-card-desc">B&uuml;ros und Betriebe, die frisches Wasser f&uuml;r Mitarbeiter suchen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 59,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-group animate fade-up">
+        <h3><span class="cat-icon house">&#127968;</span> Haus &amp; Sicherheit</h3>
+        <div class="leads-grid">
+          <div class="lead-card">
+            <div class="lead-card-icon">&#128999;</div>
+            <h4>Fenster</h4>
+            <p class="lead-card-desc">Eigenheimbesitzer mit konkretem Renovierungsbedarf.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 39,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#127966;&#65039;</div>
+            <h4>Dachfenster</h4>
+            <p class="lead-card-desc">Hausbesitzer, die Dachgeschoss ausbauen oder sanieren.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 39,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#128682;</div>
+            <h4>Haust&uuml;ren</h4>
+            <p class="lead-card-desc">Eigent&uuml;mer, die Sicherheit und Optik verbessern wollen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 39,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <span class="lead-badge">Beliebt</span>
+            <div class="lead-card-icon">&#128275;</div>
+            <h4>Alarmanlagen</h4>
+            <p class="lead-card-desc">Haus- und Wohnungsbesitzer mit Sicherheitsbedarf.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 39,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <div class="lead-card-icon">&#128249;</div>
+            <h4>Video&uuml;berwachung</h4>
+            <p class="lead-card-desc">Privat- und Gewerbekunden, die ihr Objekt sch&uuml;tzen wollen.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 39,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-group animate fade-up">
+        <h3><span class="cat-icon immo">&#127970;</span> Immobilien</h3>
+        <div class="leads-grid">
+          <div class="lead-card">
+            <div class="lead-card-icon">&#128714;</div>
+            <h4>Treppenlift</h4>
+            <p class="lead-card-desc">Senioren oder Angeh&ouml;rige mit akutem Bedarf an Mobilit&auml;t.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 119,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+          <div class="lead-card">
+            <span class="lead-badge">Premium</span>
+            <div class="lead-card-icon">&#127968;</div>
+            <h4>Immobilien</h4>
+            <p class="lead-card-desc">Eigent&uuml;mer mit konkreter Verkaufs- oder Bewertungsabsicht.</p>
+            <div class="lead-price-row">
+              <div class="lead-price">Ab 149,90&nbsp;€ <small>/ Lead, zzgl. 19% MwSt.</small></div>
+              <span class="lead-card-link">Bestellen &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-STEP PROCESS -->
+  <section class="process">
+    <div class="container">
+      <h2 class="section-title">So einfach funktioniert's</h2>
+      <p class="section-subtitle">In 3 Schritten zu deinen ersten Leads.</p>
+      <div class="steps">
+        <div class="step animate fade-up">
+          <div class="step-number">1</div>
+          <h3>Kostenlos registrieren</h3>
+          <p>Erstelle dein LeadArea-Konto in unter 2 Minuten.</p>
+        </div>
+        <div class="step animate fade-up" style="animation-delay: 0.15s">
+          <div class="step-number">2</div>
+          <h3>Branche &amp; Menge wählen</h3>
+          <p>Wähle deine Wunschbranche, lege die gewünschte Anzahl Leads fest und bezahle direkt online.</p>
+        </div>
+        <div class="step animate fade-up" style="animation-delay: 0.3s">
+          <div class="step-number">3</div>
+          <h3>Leads erhalten</h3>
+          <p>Deine Leads werden schnell und reibungslos direkt in dein LeadArea-Konto geliefert.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLES -->
+  <section class="comparison">
+    <div class="container">
+      <h2 class="section-title">Marktplatz-Leads vs. Exklusive Leads</h2>
+      <p class="section-subtitle">Finde die richtige Option für dein Geschäft.</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Marktplatz-Leads</th>
+            <th class="highlight">Exklusive Leads</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Preis</td>
+            <td>Ab 19,90&nbsp;€ / Lead, zzgl. MwSt.</td>
+            <td>Individuell auf Anfrage</td>
+          </tr>
+          <tr>
+            <td>Verfügbarkeit</td>
+            <td>Sofort im Shop bestellbar</td>
+            <td>Nach persönlicher Absprache</td>
+          </tr>
+          <tr>
+            <td>Abnehmer pro Lead</td>
+            <td>Bis zu 3 Abnehmer</td>
+            <td>Nur du – garantiert</td>
+          </tr>
+          <tr>
+            <td>Mindestmenge</td>
+            <td>Ab 1 Lead</td>
+            <td>Nach Vereinbarung</td>
+          </tr>
+          <tr>
+            <td>Ideal für</td>
+            <td>Schneller, günstiger Einstieg</td>
+            <td>Maximale Abschlussquote ohne Wettbewerb</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title">Warum LeadArea?</h2>
+      <p class="section-subtitle">Vergleiche die Alternativen.</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Eigene Leadgenerierung</th>
+            <th>Agentur / Lead-Portal</th>
+            <th class="highlight">LeadArea</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kosten</td>
+            <td>Ad Spend + Tool-Kosten + deine Arbeitszeit</td>
+            <td>Retainer + Ad Spend oder Provision/Pay-per-Lead</td>
+            <td>Nur der Lead-Preis – keine Fixkosten</td>
+          </tr>
+          <tr>
+            <td>Know-how</td>
+            <td>Google Ads, Meta Ads, Landingpages, Tracking</td>
+            <td>Richtige Agentur + Kontrollmöglichkeit</td>
+            <td>Kein Vorwissen nötig</td>
+          </tr>
+          <tr>
+            <td>Zeitaufwand</td>
+            <td>10–20 h/Woche</td>
+            <td>Abstimmungsschleifen, Reporting-Calls</td>
+            <td>5 Minuten – bestellen &amp; fertig</td>
+          </tr>
+          <tr>
+            <td>Vertragsbindung</td>
+            <td>Keine – aber laufende Fixkosten</td>
+            <td>Oft 3–12 Monate Mindestlaufzeit</td>
+            <td>Keine – jederzeit kündbar</td>
+          </tr>
+          <tr>
+            <td>Skalierbarkeit</td>
+            <td>Begrenzt durch Budget und Know-how</td>
+            <td>Abhängig von Agentur-Kapazität</td>
+            <td>Sofort skalierbar</td>
+          </tr>
+          <tr>
+            <td>Risiko</td>
+            <td>Hohes Risiko – Ad Spend ohne Ergebnis-Garantie</td>
+            <td>Retainer läuft auch bei schlechten Ergebnissen</td>
+            <td>Kein Risiko – schlechte Leads reklamierbar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DAS SIND WIR -->
+  <section class="team" id="team">
+    <div class="container team-inner">
+      <div class="team-story animate fade-left">
+        <div class="section-eyebrow">Das sind wir</div>
+        <h2>Erfahrung. Netzwerk. Leidenschaft.</h2>
+        <p>Was heute LeadArea ist, begann vor über zwei Jahrzehnten mit einer einfachen Überzeugung: <strong>Gute Leads entstehen nicht durch Algorithmen, sondern durch Menschen, die ihr Handwerk verstehen.</strong></p>
+        <p>Unser Gründerteam ist seit über 25 Jahren tief verwurzelt in der Welt von Vertrieb, Telesales, Marketing und Callcenter-Management — und bestens vernetzt in der gesamten Branche.</p>
+        <div class="highlight-text">Vor 14 Jahren haben wir den Schritt gewagt und unsere eigenen Callcenter aufgebaut. Heute arbeiten rund 100 Mitarbeiter in unserem Team — und jeder einzelne Lead, den du über LeadArea erhältst, wird von echten Menschen qualifiziert.</div>
+        <p>LeadArea ist kein anonymes Portal und kein Startup-Experiment. Es ist das Ergebnis von jahrzehntelanger Erfahrung, starken Partnerschaften und dem Anspruch, Leadgenerierung endlich so einfach zu machen, wie sie sein sollte.</p>
+
+        <div class="team-facts">
+          <div class="team-fact">
+            <div class="team-fact-value">25+</div>
+            <div class="team-fact-label">Jahre Branchenerfahrung</div>
+          </div>
+          <div class="team-fact">
+            <div class="team-fact-value">20+</div>
+            <div class="team-fact-label">Jahre Vertriebsexpertise</div>
+          </div>
+          <div class="team-fact">
+            <div class="team-fact-value">~100</div>
+            <div class="team-fact-label">Mitarbeiter</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="team-cards animate fade-right">
+        <div class="team-card">
+          <div class="team-photo" style="font-size:2rem;">🎯</div>
+          <div class="team-info">
+            <h3>Strategie &amp; Qualität</h3>
+            <div class="team-role">Geschäftsführung</div>
+            <p>Über 20 Jahre Erfahrung in Vertrieb und Marketing. Unser Führungsteam denkt in Strukturen, baut Prozesse und sorgt dafür, dass jeder Lead den höchsten Qualitätsstandard erfüllt.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-photo" style="font-size:2rem;">🤝</div>
+          <div class="team-info">
+            <h3>Operations &amp; Partnerschaften</h3>
+            <div class="team-role">Management</div>
+            <p>Bestens vernetzt, immer nah am Kunden. Wir steuern den operativen Betrieb und pflegen die Partnerschaften, die LeadArea stark machen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="container">
+      <h2 class="section-title">Das sagen unsere Kunden</h2>
+      <p class="section-subtitle">Echte Ergebnisse, echte Stimmen.</p>
+      <div class="testimonial-grid">
+        <div class="testimonial-card animate fade-up">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">&bdquo;Endlich eine Plattform, bei der man einfach Leads bestellt und sie auch wirklich funktionieren. Die Erreichbarkeit liegt bei uns bei &uuml;ber 90%.&ldquo;</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MK</div>
+            <div>
+              <div class="testimonial-name">Marco K.</div>
+              <div class="testimonial-role">Vertriebsleiter, Solarbranche</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card animate fade-up" style="animation-delay: 0.15s">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">&bdquo;Wir haben vorher viel Geld f&uuml;r Google Ads ausgegeben. Mit LeadArea bekommen wir bessere Leads f&uuml;r einen Bruchteil des Preises.&ldquo;</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SB</div>
+            <div>
+              <div class="testimonial-name">Sandra B.</div>
+              <div class="testimonial-role">Gesch&auml;ftsf&uuml;hrerin, Energieberatung</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card animate fade-up" style="animation-delay: 0.3s">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">&bdquo;Der pers&ouml;nliche Ansprechpartner macht den Unterschied. Wenn mal ein Lead nicht passt, wird sofort reagiert. So muss das sein.&ldquo;</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">TH</div>
+            <div>
+              <div class="testimonial-name">Thomas H.</div>
+              <div class="testimonial-role">Inhaber, Sicherheitstechnik</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="container">
+      <h2 class="section-title">Häufig gestellte Fragen</h2>
+      <p class="section-subtitle">Alles, was du wissen musst.</p>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question">
+            Was passiert, wenn ein Lead schlecht ist?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Wenn ein Lead nicht erreichbar ist oder falsche Daten enthält, kannst du ihn kostenlos reklamieren. Keine Standardmail, kein Abwimmeln – wir prüfen und erstatten.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Gibt es eine Vertragslaufzeit oder Mindestabnahme?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Nein, bei Marktplatz-Leads gibt es weder eine Vertragslaufzeit noch eine Mindestabnahme.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Werden die Leads auch an andere verkauft?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Marktplatz-Leads können an bis zu 3 Abnehmer gehen – das spiegelt sich im günstigen Preis wider.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Woher kommen die Leads?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Unsere Leads werden über Kanäle wie Google, Meta, TikTok und Native Ads generiert. Jeder Lead wird inhouse vorqualifiziert.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            Ist das DSGVO-konform?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Ja, jeder Lead wird mit dokumentierter Einwilligung generiert.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNER -->
+  <section class="partner" id="partner">
+    <div class="container partner-inner">
+      <div class="partner-content">
+        <h2>Du generierst Leads?<br>Bewirb dich als Lead-Partner.</h2>
+        <p>Verkaufe deine Leads über LeadArea und profitiere von unserer Reichweite.</p>
+        <ul class="partner-benefits">
+          <li><span class="check">&#10003;</span> Faire Konditionen</li>
+          <li><span class="check">&#10003;</span> Wöchentlicher Payout</li>
+          <li><span class="check">&#10003;</span> Volumen skalierbar</li>
+        </ul>
+      </div>
+      <div class="partner-form" id="kontakt">
+        <h3>Jetzt bewerben</h3>
+        <div class="form-group">
+          <label for="vorname">Vorname</label>
+          <input type="text" id="vorname" placeholder="Dein Vorname">
+        </div>
+        <div class="form-group">
+          <label for="nachname">Nachname</label>
+          <input type="text" id="nachname" placeholder="Dein Nachname">
+        </div>
+        <div class="form-group">
+          <label for="telefon">Telefonnummer</label>
+          <input type="tel" id="telefon" placeholder="Deine Telefonnummer">
+        </div>
+        <div class="form-group">
+          <label for="email">E-Mail</label>
+          <input type="email" id="email" placeholder="Deine E-Mail-Adresse">
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="dsgvo">
+          <label for="dsgvo">Ich stimme der Verarbeitung meiner Daten gemäß der Datenschutzerklärung zu.</label>
+        </div>
+        <button class="btn btn-accent" style="width:100%;">Bewerbung absenden</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPANY FACTS -->
+  <section class="company-facts">
+    <div class="container">
+      <h2 class="section-title">Warum uns Kunden vertrauen</h2>
+      <p class="section-subtitle">LeadArea ist kein Startup und kein anonymes Portal. Hinter uns steht ein echtes Team mit echten Werten.</p>
+      <div class="facts-grid">
+        <div class="fact-card animate fade-up">
+          <div class="fact-icon">&#127942;</div>
+          <div class="fact-value">20+</div>
+          <div class="fact-label">Jahre Branchenerfahrung</div>
+          <p class="fact-desc">Seit &uuml;ber zwei Jahrzehnten kennen wir den Markt, die Kan&auml;le und die Mechanik hinter erfolgreicher Leadgenerierung.</p>
+        </div>
+        <div class="fact-card animate fade-up" style="animation-delay: 0.1s">
+          <div class="fact-icon">&#127970;</div>
+          <div class="fact-value">14</div>
+          <div class="fact-label">Jahre als Unternehmen am Markt</div>
+          <p class="fact-desc">Kein Experiment, sondern ein etabliertes Unternehmen mit langfristiger Strategie und stabilen Prozessen.</p>
+        </div>
+        <div class="fact-card animate fade-up" style="animation-delay: 0.2s">
+          <div class="fact-icon">&#128101;</div>
+          <div class="fact-value">~100</div>
+          <div class="fact-label">Mitarbeiter im Team</div>
+          <p class="fact-desc">Ein starkes Team aus Profis in Vertrieb, Qualit&auml;tssicherung und Kundenbetreuung &ndash; keine One-Man-Show.</p>
+        </div>
+        <div class="fact-card animate fade-up" style="animation-delay: 0.3s">
+          <div class="fact-icon">&#129309;</div>
+          <div class="fact-value">8+</div>
+          <div class="fact-label">Jahre durchschnittliche Betriebszugeh&ouml;rigkeit</div>
+          <p class="fact-desc">Unsere Mitarbeiter bleiben &ndash; weil die Arbeit stimmt. Das sp&uuml;rst du an der Qualit&auml;t deiner Leads.</p>
+        </div>
+      </div>
+      <div class="facts-badges animate fade-up" style="animation-delay: 0.4s">
+        <div class="facts-badge">
+          <span class="facts-badge-icon">&#9878;</span>
+          <div>
+            <strong>100% DSGVO-konform</strong>
+            <span>Dokumentierte Einwilligung f&uuml;r jeden einzelnen Lead</span>
+          </div>
+        </div>
+        <div class="facts-badge">
+          <span class="facts-badge-icon">&#128200;</span>
+          <div>
+            <strong>Inhouse-Qualifizierung</strong>
+            <span>Jeder Lead wird von unserem Team gepr&uuml;ft &ndash; kein Zukauf, kein Reselling</span>
+          </div>
+        </div>
+        <div class="facts-badge">
+          <span class="facts-badge-icon">&#128222;</span>
+          <div>
+            <strong>Pers&ouml;nlicher Ansprechpartner</strong>
+            <span>Bei uns landen Sie nicht in einer Warteschleife</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <div class="container">
+      <h2>Dein nächster Lead wartet. Ab 19,90&nbsp;€.</h2>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">20+</div>
+          <div class="stat-label">Jahre Erfahrung</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">~100</div>
+          <div class="stat-label">Mitarbeiter</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">14</div>
+          <div class="stat-label">Branchen verf&uuml;gbar</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">0&nbsp;€</div>
+          <div class="stat-label">Grundgeb&uuml;hr</div>
+        </div>
+      </div>
+      <a href="bestellen.html" class="btn btn-primary btn-cta-pulse" style="background: white; color: var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,0.2);">Jetzt Leads bestellen</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">Lead<span>Area</span></div>
+          <p>Der erste Marktplatz für qualifizierte Leads.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Instagram">in</a>
+            <a href="#" aria-label="LinkedIn">Li</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Schnelle Links</h4>
+          <ul>
+            <li><a href="#">Startseite</a></li>
+            <li><a href="#categories">Marktplatz</a></li>
+            <li><a href="#partner">Partner werden</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Rechtliches</h4>
+          <ul>
+            <li><a href="impressum.html">Impressum</a></li>
+            <li><a href="#">Datenschutz</a></li>
+            <li><a href="#">AGB</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kontakt</h4>
+          <ul>
+            <li><a href="mailto:info@leadarea.de">info@leadarea.de</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2025 LeadArea. Alle Rechte vorbehalten.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var item = this.closest('.faq-item');
+        var wasActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(function(el) {
+          el.classList.remove('active');
+        });
+        if (!wasActive) item.classList.add('active');
+      });
+    });
+
+    // Scroll animations
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.animate').forEach(function(el) {
+      observer.observe(el);
+    });
+
+    // Dashboard Live-Zahlen
+    var branches = ['Photovoltaik','Wärmepumpe','Strom & Gas','Alarmanlagen','Fenster','Energieberatung','Treppenlift','Immobilien','Kaffeevollautomat','Wasserspender'];
+    var statuses = [
+      { label: 'Geliefert', cls: 'status-delivered' },
+      { label: 'In Bearbeitung', cls: 'status-progress' }
+    ];
+
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    function animateValue(el, target, suffix) {
+      var start = 0;
+      var duration = 1200;
+      var step = Math.ceil(target / (duration / 30));
+      var current = 0;
+      var timer = setInterval(function() {
+        current += step;
+        if (current >= target) { current = target; clearInterval(timer); }
+        el.textContent = current + (suffix || '');
+      }, 30);
+    }
+
+    function refreshDashboard() {
+      var leads = randInt(28, 156);
+      var reach = randInt(86, 97);
+      var roi = (randInt(22, 48) / 10).toFixed(1);
+
+      animateValue(document.getElementById('statLeads'), leads, '');
+      animateValue(document.getElementById('statReach'), reach, '%');
+      document.getElementById('statRoi').textContent = roi + 'x';
+
+      var ordersEl = document.getElementById('dashOrders');
+      var shuffled = branches.slice().sort(function() { return 0.5 - Math.random(); });
+      var picks = shuffled.slice(0, 3);
+      var html = '';
+      for (var i = 0; i < picks.length; i++) {
+        var qty = randInt(5, 50);
+        var st = statuses[i < 2 ? 0 : 1];
+        html += '<div class="dash-order">' +
+          '<span class="dash-order-name">' + picks[i] + '</span>' +
+          '<span class="dash-order-count">' + qty + ' Leads</span>' +
+          '<span class="dash-order-status ' + st.cls + '">' + st.label + '</span>' +
+        '</div>';
+      }
+      ordersEl.innerHTML = html;
+    }
+
+    refreshDashboard();
+    setInterval(refreshDashboard, 5000);
+  </script>
+
+</body>
+</html>

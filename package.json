@@ -1,0 +1,31 @@
+{
+  "name": "leadpuls",
+  "version": "1.0.0",
+  "description": "Leadpuls - Der moderne Marktplatz für qualifizierte Leads",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "leads",
+    "marketplace"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.11.1",
+    "connect-sqlite3": "^0.9.16",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.1",
+    "stripe": "^22.3.0"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "better-sqlite3@12.11.1": true,
+    "sqlite3@5.1.7": true
+  }
+}

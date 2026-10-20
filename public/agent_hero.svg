@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" width="480" height="340">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#edf9d5"/>
+      <stop offset="100%" stop-color="#c5e890"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f9d5b0"/>
+      <stop offset="100%" stop-color="#e8b484"/>
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7ab51d"/>
+      <stop offset="100%" stop-color="#4e8a00"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="480" height="340" fill="url(#bgGrad)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="420" cy="290" r="120" fill="#7ab51d" fill-opacity="0.12"/>
+  <circle cx="55" cy="65" r="80" fill="#0d9488" fill-opacity="0.08"/>
+  <circle cx="430" cy="38" r="48" fill="#ffffff" fill-opacity="0.30"/>
+  <circle cx="45" cy="305" r="55" fill="#ffffff" fill-opacity="0.18"/>
+  <circle cx="160" cy="308" r="25" fill="#7ab51d" fill-opacity="0.10"/>
+
+  <!-- Shirt / torso -->
+  <path d="M95 345 Q112 288 150 272 Q188 258 240 256 Q292 258 330 272 Q368 288 385 345 Z" fill="url(#shirtGrad)"/>
+  <!-- V-collar -->
+  <path d="M221 258 L240 278 L259 258" stroke="white" stroke-width="2.5" fill="none" stroke-linejoin="round" opacity="0.8"/>
+
+  <!-- Neck -->
+  <rect x="225" y="226" width="30" height="38" rx="13" fill="url(#skinGrad)"/>
+
+  <!-- Head -->
+  <ellipse cx="240" cy="183" rx="57" ry="61" fill="url(#skinGrad)"/>
+
+  <!-- Hair – top mass -->
+  <ellipse cx="240" cy="136" rx="58" ry="28" fill="#3a271a"/>
+  <path d="M185 148 Q188 118 240 112 Q292 118 295 148 Q285 140 240 137 Q195 140 185 148 Z" fill="#3a271a"/>
+  <!-- Hair – left side falling -->
+  <path d="M186 152 Q176 195 180 248 Q194 260 208 255 Q194 235 196 178 Z" fill="#3a271a"/>
+  <!-- Hair – right side falling -->
+  <path d="M294 152 Q304 195 300 248 Q286 260 272 255 Q286 235 284 178 Z" fill="#3a271a"/>
+  <!-- Hair shine -->
+  <path d="M210 126 Q240 118 268 126 Q256 120 240 119 Q224 120 210 126 Z" fill="#5c3e2e" opacity="0.6"/>
+
+  <!-- Headset band -->
+  <path d="M193 165 Q240 123 287 165" stroke="#222222" stroke-width="7.5" fill="none" stroke-linecap="round"/>
+  <!-- Left ear cushion -->
+  <rect x="181" y="159" width="21" height="32" rx="8" fill="#222222"/>
+  <rect x="184" y="162" width="15" height="26" rx="6" fill="#3a3a3a"/>
+  <ellipse cx="191" cy="175" rx="5" ry="6" fill="#1a1a1a"/>
+  <!-- Right ear cushion -->
+  <rect x="278" y="159" width="21" height="32" rx="8" fill="#222222"/>
+  <rect x="281" y="162" width="15" height="26" rx="6" fill="#3a3a3a"/>
+  <ellipse cx="288" cy="175" rx="5" ry="6" fill="#1a1a1a"/>
+  <!-- Mic arm -->
+  <path d="M292 182 Q320 196 317 222" stroke="#222222" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="317" cy="226" rx="8" ry="5.5" fill="#222222"/>
+  <ellipse cx="317" cy="226" rx="4" ry="3" fill="#7ab51d"/>
+
+  <!-- Ear (left, partly visible) -->
+  <ellipse cx="185" cy="189" rx="6" ry="8" fill="#e8b484"/>
+
+  <!-- Eyebrows -->
+  <path d="M209 178 Q218 173 227 177" stroke="#3a271a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M253 177 Q262 173 271 178" stroke="#3a271a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Left eye -->
+  <ellipse cx="218" cy="191" rx="9.5" ry="10.5" fill="white"/>
+  <circle cx="219.5" cy="192" r="7" fill="#3a271a"/>
+  <circle cx="221.5" cy="190" r="2.8" fill="white"/>
+  <path d="M209 187 Q218 181 227 187" stroke="#3a271a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Right eye -->
+  <ellipse cx="262" cy="191" rx="9.5" ry="10.5" fill="white"/>
+  <circle cx="263.5" cy="192" r="7" fill="#3a271a"/>
+  <circle cx="265.5" cy="190" r="2.8" fill="white"/>
+  <path d="M253 187 Q262 181 271 187" stroke="#3a271a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Nose -->
+  <path d="M237 201 Q234 212 240 215 Q246 212 243 201" stroke="#c98860" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Smile + lip fill -->
+  <path d="M224 224 Q240 237 256 224" stroke="#b86050" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M228 224 Q240 233 252 224 Q248 230 240 231 Q232 230 228 224 Z" fill="#d07868" fill-opacity="0.50"/>
+
+  <!-- Blush -->
+  <ellipse cx="202" cy="210" rx="14" ry="9" fill="#f09898" fill-opacity="0.22"/>
+  <ellipse cx="278" cy="210" rx="14" ry="9" fill="#f09898" fill-opacity="0.22"/>
+
+  <!-- Speech bubble -->
+  <rect x="308" y="70" width="150" height="95" rx="16" fill="white" fill-opacity="0.92" filter="url(#softShadow)"/>
+  <path d="M312 150 L292 166 L328 150 Z" fill="white" fill-opacity="0.92"/>
+  <rect x="325" y="90" width="75" height="9" rx="4.5" fill="#7ab51d" fill-opacity="0.45"/>
+  <rect x="325" y="107" width="100" height="8" rx="4" fill="#888888" fill-opacity="0.18"/>
+  <rect x="325" y="121" width="85" height="8" rx="4" fill="#888888" fill-opacity="0.18"/>
+  <rect x="325" y="135" width="65" height="8" rx="4" fill="#7ab51d" fill-opacity="0.30"/>
+  <circle cx="440" cy="86" r="10" fill="#7ab51d" fill-opacity="0.20"/>
+  <circle cx="440" cy="84" r="5" fill="#7ab51d" fill-opacity="0.35"/>
+
+  <!-- Signal waves (left) -->
+  <path d="M40 122 Q55 111 40 100" stroke="#7ab51d" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.80"/>
+  <path d="M34 136 Q58 120 34 94" stroke="#7ab51d" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.55"/>
+  <path d="M28 150 Q61 129 28 88" stroke="#7ab51d" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.32"/>
+
+  <!-- Verified badge -->
+  <rect x="142" y="294" width="196" height="36" rx="18" fill="white" fill-opacity="0.72" filter="url(#softShadow)"/>
+  <circle cx="170" cy="312" r="12" fill="#7ab51d"/>
+  <path d="M163 312 L168 318 L178 306" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="191" y="317" font-family="'Segoe UI', Arial, sans-serif" font-size="12.5" fill="#2d5a00" font-weight="700">Telefonisch qualifiziert</text>
+
+  <!-- Sparkle dots -->
+  <circle cx="140" cy="78" r="4" fill="#7ab51d" fill-opacity="0.55"/>
+  <circle cx="120" cy="91" r="2.5" fill="#7ab51d" fill-opacity="0.38"/>
+  <circle cx="155" cy="94" r="2" fill="#7ab51d" fill-opacity="0.32"/>
+  <circle cx="362" cy="275" r="3.5" fill="#7ab51d" fill-opacity="0.45"/>
+  <circle cx="383" cy="262" r="2.5" fill="#0d9488" fill-opacity="0.38"/>
+  <circle cx="450" cy="178" r="5" fill="#7ab51d" fill-opacity="0.28"/>
+  <circle cx="465" cy="200" r="3" fill="#7ab51d" fill-opacity="0.20"/>
+  <circle cx="455" cy="220" r="2" fill="#0d9488" fill-opacity="0.25"/>
+</svg>
