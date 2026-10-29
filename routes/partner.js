@@ -2,13 +2,11 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const multer = require('multer');
-const bcrypt = require('bcrypt');
 const { getDb } = require('../database');
 const { requirePartner } = require('../middleware/auth');
 const { getVatForCountry, formatVatRate } = require('../lib/vat');
 const { sendPartnerApplicationNotification, sendPartnerWelcomeMail } = require('../lib/mailer');
 const { getDeliveryTemplate } = require('../lib/deliveryTemplate');
-const { PARTNER_PASSWORD_PATTERN, PARTNER_PASSWORD_HINWEIS } = require('../lib/passwordPolicy');
 
 const UPLOADS_BASE = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'public', 'uploads');
 const partnerUpload = multer({ dest: path.join(UPLOADS_BASE, 'csv') });
@@ -120,12 +118,12 @@ router.get('/partner', (req, res) => {
 });
 
 router.post('/partner', async (req, res) => {
-  const { company, first_name, last_name, street, house_number, postal_code, city, country, phone, email, tax_number, message, appointment_date, appointment_time, password, password2, agb, newsletter } = req.body;
+  const { company, first_name, last_name, street, house_number, postal_code, city, country, phone, email, tax_number, message, appointment_date, appointment_time, agb, newsletter } = req.body;
   const db = getDb();
   const products = db.prepare('SELECT * FROM lead_products WHERE active = 1').all();
   const projectTilesHtml = buildProjectTilesHtml(products);
 
-  if (!company || !first_name || !last_name || !street || !house_number || !postal_code || !city || !country || !phone || !email || !password) {
+  if (!company || !first_name || !last_name || !street || !house_number || !postal_code || !city || !country || !phone || !email) {
     const alertHtml = '<div class="alert alert-error">Bitte fülle alle Pflichtfelder aus.</div>';
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
   }
@@ -140,19 +138,9 @@ router.post('/partner', async (req, res) => {
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
   }
 
-  if (password !== password2) {
-    const alertHtml = '<div class="alert alert-error">Die Passwörter stimmen nicht überein.</div>';
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
-  }
-
-  if (!PARTNER_PASSWORD_PATTERN.test(password)) {
-    const alertHtml = `<div class="alert alert-error">${PARTNER_PASSWORD_HINWEIS}</div>`;
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
-  }
-
   const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
   if (existingUser) {
-    const alertHtml = '<div class="alert alert-error">Diese E-Mail-Adresse ist bereits registriert. Bitte logge dich ein oder nutze eine andere E-Mail-Adresse.</div>';
+    const alertHtml = '<div class="alert alert-error">Diese E-Mail-Adresse ist bereits als Partner registriert. Bitte logge dich ein oder nutze eine andere E-Mail-Adresse.</div>';
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
   }
 
@@ -171,20 +159,11 @@ router.post('/partner', async (req, res) => {
   const insertProject = db.prepare('INSERT INTO partner_application_projects (application_id, product_id) VALUES (?, ?)');
   for (const productId of projectIds) insertProject.run(applicationId, productId);
 
-  // Account wird direkt bei der Bewerbung mit dem selbst gewählten Passwort
-  // angelegt (nicht erst bei Admin-Freigabe) - Zugriff auf Leads/Dashboard-
-  // Inhalte bleibt trotzdem bis zur Freigabe gesperrt (contract_signed_at/
-  // can_upload/partner_approved_products, siehe getContractStatus oben).
-  // Vorher wurde bei Freigabe ein Zufallspasswort generiert, das nie an den
-  // Partner kommuniziert wurde (siehe routes/admin.js) - dieser Weg ersetzt das.
-  const hash = await bcrypt.hash(password, 10);
-  const crypto = require('crypto');
-  const apiKey = 'lp_' + crypto.randomBytes(24).toString('hex');
-  const { lastInsertRowid: userId } = db.prepare(`
-    INSERT INTO users (email, password_hash, first_name, last_name, phone, country, role, api_key)
-    VALUES (?, ?, ?, ?, ?, ?, 'partner', ?)
-  `).run(email, hash, first_name, last_name, phone, country, apiKey);
-
+  // Bei der Erstkontakt/Bewerbung wird bewusst KEIN Account/Passwort
+  // abgefragt (Feedback Benni, 2026-10-29: schreckt Interessenten ab) - nur
+  // Stammdaten erfassen. Account + Passwort-Vergabe passiert erst, wenn der
+  // Vertrag vorliegt und Jens/Frank den Partner im Admin auf "Angenommen"
+  // setzen (siehe routes/admin.js, sendPartnerAccountActivationMail).
   const projectNames = projectIds.map(id => (products.find(p => p.id === id) || {}).name).filter(Boolean);
   sendPartnerApplicationNotification({
     company, firstName: first_name, lastName: last_name, phone, email, country, projectNames,
@@ -196,12 +175,8 @@ router.post('/partner', async (req, res) => {
     stammdaten: { company, firstName: first_name, lastName: last_name, street, houseNumber: house_number, postalCode: postal_code, city, country, phone, email, taxNumber: tax_number },
   }).catch(err => console.error('[Partner-Welcome-Mail] Mail-Versand fehlgeschlagen:', err));
 
-  req.session.userId = userId;
-  req.session.email = email;
-  req.session.firstName = first_name;
-  req.session.lastName = last_name;
-  req.session.role = 'partner';
-  res.redirect('/partner/dashboard');
+  const alertHtml = '<div class="alert alert-success">Danke für deine Bewerbung! Wir haben dir eine E-Mail mit den nächsten Schritten geschickt und melden uns zeitnah bei dir für ein persönliches Gespräch.</div>';
+  req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
 });
 
 // PARTNER DASHBOARD

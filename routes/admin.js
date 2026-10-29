@@ -655,16 +655,26 @@ router.post('/partners/:id', (req, res) => {
 
   if (newStatus === 'accepted' && application.status !== 'accepted') {
     const crypto = require('crypto');
+    const { sendPartnerAccountActivationMail } = require('../lib/mailer');
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(application.email);
     if (!existing) {
+      // Passwort wird nur als Platzhalter-Hash gesetzt (nie kommuniziert) -
+      // der Partner vergibt sein echtes Passwort selbst über den
+      // Freigabe-Link (reset_token, 7 Tage gültig, gleicher Mechanismus wie
+      // "Passwort vergessen"). Vorher wurde hier ein Zufallspasswort nur ins
+      // Server-Log geschrieben und nie an den Partner geschickt - kaputter
+      // Zustand, siehe Git-History.
       const tempPassword = generatePartnerPassword();
       const hash = bcrypt.hashSync(tempPassword, 10);
       const apiKey = 'lp_' + crypto.randomBytes(24).toString('hex');
+      const token = crypto.randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       db.prepare(`
-        INSERT INTO users (email, password_hash, first_name, last_name, phone, country, role, api_key)
-        VALUES (?, ?, ?, ?, ?, ?, 'partner', ?)
-      `).run(application.email, hash, application.first_name, application.last_name, application.phone || null, application.country || null, apiKey);
-      console.log(`Partner-Account erstellt: ${application.email} / ${tempPassword} / API-Key: ${apiKey}`);
+        INSERT INTO users (email, password_hash, first_name, last_name, phone, country, role, api_key, reset_token, reset_token_expires)
+        VALUES (?, ?, ?, ?, ?, ?, 'partner', ?, ?, ?)
+      `).run(application.email, hash, application.first_name, application.last_name, application.phone || null, application.country || null, apiKey, token, expires);
+      sendPartnerAccountActivationMail({ toEmail: application.email, firstName: application.first_name, resetToken: token })
+        .catch(err => console.error('[Partner-Freigabe-Mail] Mail-Versand fehlgeschlagen:', err));
     }
   }
 
