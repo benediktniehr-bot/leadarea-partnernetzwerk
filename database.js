@@ -252,6 +252,11 @@ function initializeDatabase() {
     "ALTER TABLE lead_pool ADD COLUMN qm_processed_by INTEGER",
     "ALTER TABLE users ADD COLUMN qm_team_lead_id INTEGER",
     "ALTER TABLE lead_pool ADD COLUMN assigned_to INTEGER",
+    "ALTER TABLE lead_products ADD COLUMN production_paused INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE users ADD COLUMN contract_signed_at DATETIME",
+    "ALTER TABLE lead_products ADD COLUMN partner_description TEXT",
+    "ALTER TABLE users ADD COLUMN reset_token TEXT",
+    "ALTER TABLE users ADD COLUMN reset_token_expires DATETIME",
   ];
 
   db.exec(`
@@ -308,6 +313,18 @@ function initializeDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id),
       FOREIGN KEY (pool_lead_id) REFERENCES lead_pool(id)
+    );
+    -- Welche Projekte ein Partner tatsaechlich produzieren darf - unabhaengig
+    -- davon, was er bei der Bewerbung (partner_application_projects) gewuenscht
+    -- hatte. Admin pflegt das erst nach Vertragsunterschrift (users.contract_signed_at),
+    -- steuert Sichtbarkeit von Upload-Dropdown + Liefertemplate-Download.
+    CREATE TABLE IF NOT EXISTS partner_approved_products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      product_id INTEGER NOT NULL,
+      approved_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (product_id) REFERENCES lead_products(id)
     );
   `);
   for (const sql of migrations) {

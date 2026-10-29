@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -8,7 +9,7 @@ const { attachUser } = require('./middleware/auth');
 const app = express();
 const PORT = 3000;
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-const DEFAULT_META_DESCRIPTION = 'LeadArea ist der Marktplatz für telefonisch qualifizierte Leads – ab 19,90 € pro Lead, ohne Vertragslaufzeit, mit Gesprächsaufnahme als Nachweis.';
+const DEFAULT_META_DESCRIPTION = 'Partner-LeadArea: Werde Produktionspartner und profitiere von langjährigen Kooperationen, einem großen Netzwerk und unserem Know-how.';
 
 initializeDatabase();
 
@@ -32,37 +33,45 @@ app.use(session({
 
 app.use(attachUser);
 
-// HARTE Sperre (nicht nur Nav-Link-Verstecken): Marktplatz/Preise sind streng
-// vertraulich - Partner und QM-Mitarbeiter duerfen dort unter keinen
-// Umstaenden hinkommen, auch nicht per direkt eingetippter URL. Blockiert
-// alle Marktplatz-/Warenkorb-/Checkout-/Kaeufer-Dashboard-Pfade fuer diese
-// Rollen und schickt sie in ihren eigenen Bereich zurueck.
-const MARKETPLACE_RESTRICTED_PREFIXES = ['/marktplatz', '/dashboard', '/cart', '/checkout', '/order'];
+// HARTE Sperre (nicht nur Nav-Link-Verstecken): Solange nur Partner-LeadArea
+// (Produktionspartner-Akquise) live geht, darf NICHTS auf das Kaeuferportal/
+// den Marktplatz hinweisen - sonst funktioniert die Strategie nicht (Partner
+// sollen nicht sehen/wissen, dass "ihre" Leads anderswo verkauft werden, und
+// Besucher sollen gar nicht erst auf die Kaeuferseite stossen). Gilt fuer
+// ALLE Rollen (auch anonyme Besucher und Kaeufer-Accounts) ausser Admin -
+// nur Admin darf den Marktplatz zu Verwaltungszwecken noch sehen.
+const MARKETPLACE_RESTRICTED_PREFIXES = ['/marktplatz', '/dashboard', '/cart', '/checkout', '/order', '/register'];
 app.use((req, res, next) => {
   const role = req.session && req.session.role;
-  if (!role || !['partner', 'qm_lead', 'qm_agent'].includes(role)) return next();
+  if (role === 'admin') return next();
+  if (req.path === '/') return res.redirect('/partner');
   if (!MARKETPLACE_RESTRICTED_PREFIXES.some(p => req.path === p || req.path.startsWith(p + '/'))) return next();
 
   if (role === 'partner') return res.redirect('/partner/dashboard');
-  return res.redirect('/qm');
+  if (role === 'qm_lead' || role === 'qm_agent') return res.redirect('/qm');
+  return res.redirect('/partner');
 });
 
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(
     'User-agent: *\n' +
     'Allow: /\n' +
+    'Disallow: /marktplatz\n' +
+    'Disallow: /register\n' +
     'Disallow: /dashboard\n' +
+    'Disallow: /cart\n' +
+    'Disallow: /checkout\n' +
+    'Disallow: /order\n' +
     'Disallow: /partner/dashboard\n' +
     'Disallow: /admin\n' +
     'Disallow: /qm\n' +
-    'Disallow: /checkout\n' +
     'Disallow: /api\n' +
     `\nSitemap: ${BASE_URL}/sitemap.xml\n`
   );
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  const pages = ['/', '/marktplatz', '/partner', '/register', '/login'];
+  const pages = ['/partner', '/login'];
   const urls = pages.map(p => `  <url><loc>${BASE_URL}${p}</loc></url>`).join('\n');
   res.type('application/xml').send(
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -111,12 +120,15 @@ function renderPage(res, viewName, data = {}) {
   // (app.use('/qm', qmRoutes)) - req.path ist dort relativ zum Mountpoint
   // und haette den Praefix schon abgeschnitten, deshalb hier originalUrl.
   const isQmArea = res.req.originalUrl.startsWith('/qm');
-  const isRestrictedArea = isPartnerArea || isQmArea;
   const headerClaim = isPartnerArea ? 'unser Netzwerk ist dein Erfolg' : 'Vorsprung beginnt hier';
   const headerClaimClass = isPartnerArea ? 'header-claim-partner' : '';
-  const navMarketplace = isRestrictedArea ? '' : '<a href="/marktplatz" class="nav-link">Marktplatz</a>';
-  const footerMarketplace = isRestrictedArea ? '' : '<li><a href="/marktplatz">Marktplatz</a></li>';
-  const cartBadge = (!isRestrictedArea && allData.cartCount > 0)
+  // Solange nur Partner-LeadArea live ist, darf der Marktplatz-Link nirgends
+  // auftauchen (siehe harte Sperre weiter oben) - Ausnahme nur fuer Admin,
+  // der den Marktplatz weiterhin zu Verwaltungszwecken erreichen koennen soll.
+  const canSeeMarketplace = allData.user && allData.user.role === 'admin';
+  const navMarketplace = (canSeeMarketplace && !isPartnerArea && !isQmArea) ? '<a href="/marktplatz" class="nav-link">Marktplatz</a>' : '';
+  const footerMarketplace = (canSeeMarketplace && !isPartnerArea && !isQmArea) ? '<li><a href="/marktplatz">Marktplatz</a></li>' : '';
+  const cartBadge = (canSeeMarketplace && !isPartnerArea && !isQmArea && allData.cartCount > 0)
     ? `<a href="/checkout" class="cart-link"><span class="cart-icon">🛒</span><span class="cart-badge">${allData.cartCount}</span></a>`
     : '';
 

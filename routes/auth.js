@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { getDb } = require('../database');
+const { sendPasswordResetMail } = require('../lib/mailer');
+const { PARTNER_PASSWORD_PATTERN, PARTNER_PASSWORD_HINWEIS } = require('../lib/passwordPolicy');
 
 // EU-Staaten + Schweiz, UK, Norwegen, Island, Liechtenstein – Käufer nur aus diesen Ländern
 const ALLOWED_BUYER_COUNTRIES = [
@@ -132,6 +135,87 @@ router.get('/logout', (req, res) => {
   }
   req.session.destroy(() => {
     res.redirect('/');
+  });
+});
+
+router.get('/forgot-password', (req, res) => {
+  req.app.locals.renderPage(res, 'forgot-password.html', { pageTitle: 'Passwort vergessen', alertHtml: '' });
+});
+
+router.post('/forgot-password', (req, res) => {
+  const db = getDb();
+  const { email } = req.body;
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email || '');
+  if (user) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    db.prepare('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?').run(token, expires, user.id);
+    sendPasswordResetMail({ toEmail: user.email, firstName: user.first_name, resetToken: token })
+      .catch(err => console.error('[Passwort-Reset-Mail] fehlgeschlagen:', err));
+  }
+  // Immer dieselbe Meldung, egal ob die E-Mail existiert - verhindert, dass
+  // sich darüber ausspähen lässt, welche E-Mails registriert sind.
+  req.app.locals.renderPage(res, 'forgot-password.html', {
+    pageTitle: 'Passwort vergessen',
+    alertHtml: '<div class="alert alert-success">Falls diese E-Mail-Adresse bei uns registriert ist, haben wir dir einen Link zum Zurücksetzen geschickt.</div>',
+  });
+});
+
+router.get('/reset-password/:token', (req, res) => {
+  const db = getDb();
+  const user = db.prepare('SELECT * FROM users WHERE reset_token = ?').get(req.params.token);
+  if (!user || !user.reset_token_expires || new Date(user.reset_token_expires) < new Date()) {
+    return req.app.locals.renderPage(res, 'login.html', {
+      pageTitle: 'Login',
+      alertHtml: '<div class="alert alert-error">Der Link zum Zurücksetzen ist ungültig oder abgelaufen. Bitte fordere einen neuen an.</div>',
+    });
+  }
+  req.app.locals.renderPage(res, 'reset-password.html', {
+    pageTitle: 'Neues Passwort vergeben', token: req.params.token, alertHtml: '',
+    passwordMinlength: user.role === 'partner' ? 10 : 6,
+    passwordPattern: user.role === 'partner' ? PARTNER_PASSWORD_PATTERN.source.replace(/^\^|\$$/g, '') : '.{6,}',
+    passwordHint: user.role === 'partner' ? PARTNER_PASSWORD_HINWEIS : 'Mindestens 6 Zeichen.',
+  });
+});
+
+router.post('/reset-password/:token', async (req, res) => {
+  const db = getDb();
+  const user = db.prepare('SELECT * FROM users WHERE reset_token = ?').get(req.params.token);
+  if (!user || !user.reset_token_expires || new Date(user.reset_token_expires) < new Date()) {
+    return req.app.locals.renderPage(res, 'login.html', {
+      pageTitle: 'Login',
+      alertHtml: '<div class="alert alert-error">Der Link zum Zurücksetzen ist ungültig oder abgelaufen. Bitte fordere einen neuen an.</div>',
+    });
+  }
+  const passwordFieldProps = {
+    passwordMinlength: user.role === 'partner' ? 10 : 6,
+    passwordPattern: user.role === 'partner' ? PARTNER_PASSWORD_PATTERN.source.replace(/^\^|\$$/g, '') : '.{6,}',
+    passwordHint: user.role === 'partner' ? PARTNER_PASSWORD_HINWEIS : 'Mindestens 6 Zeichen.',
+  };
+  const { password, password2 } = req.body;
+  if (password !== password2) {
+    return req.app.locals.renderPage(res, 'reset-password.html', {
+      pageTitle: 'Neues Passwort vergeben', token: req.params.token, ...passwordFieldProps,
+      alertHtml: '<div class="alert alert-error">Die Passwörter stimmen nicht überein.</div>',
+    });
+  }
+  // Partner unterliegen der strengeren Policy (min. 10 Zeichen, siehe
+  // lib/passwordPolicy.js), Käufer weiterhin min. 6 Zeichen wie bei der
+  // Registrierung in routes/auth.js (nicht Teil dieser Aufgabe geändert).
+  const isValid = user.role === 'partner'
+    ? PARTNER_PASSWORD_PATTERN.test(password || '')
+    : !!password && password.length >= 6;
+  if (!isValid) {
+    return req.app.locals.renderPage(res, 'reset-password.html', {
+      pageTitle: 'Neues Passwort vergeben', token: req.params.token, ...passwordFieldProps,
+      alertHtml: `<div class="alert alert-error">${passwordFieldProps.passwordHint}</div>`,
+    });
+  }
+  const hash = await bcrypt.hash(password, 10);
+  db.prepare('UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?').run(hash, user.id);
+  req.app.locals.renderPage(res, 'login.html', {
+    pageTitle: 'Login',
+    alertHtml: '<div class="alert alert-success">Dein Passwort wurde geändert. Du kannst dich jetzt einloggen.</div>',
   });
 });
 

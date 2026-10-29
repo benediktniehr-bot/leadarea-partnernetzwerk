@@ -16,6 +16,28 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
+// Partner-Passwort-Policy: strenger als die Käufer-Registrierung
+// (routes/auth.js, min. 6 Zeichen) - mind. 10 Zeichen, Groß-/Kleinbuchstabe
+// und Sonderzeichen, auf Wunsch von Jens/Frank (2026-10-21). Zeichensätze
+// bewusst ohne verwechselbare Zeichen (0/O, 1/l/I), da das Passwort als
+// Zufallswert ohne eigene Eingabe des Partners vergeben wird.
+function generatePartnerPassword(length = 12) {
+  const crypto = require('crypto');
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+  const digits = '23456789';
+  const special = '!@#$%&*?';
+  const all = lower + upper + digits + special;
+  const pick = (chars) => chars[crypto.randomInt(chars.length)];
+  const chars = [pick(lower), pick(upper), pick(special), pick(digits)];
+  while (chars.length < length) chars.push(pick(all));
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
 router.use(requireAdmin);
 
 // Status-Set für Partner-LeadArea (Stand 2026-10-19, angelehnt an SalesTeam):
@@ -587,6 +609,7 @@ router.get('/partners', (req, res) => {
 
   for (const a of applications) {
     const statusLabel = { new: 'Neu', contacted: 'Kontaktiert', accepted: 'Angenommen', rejected: 'Abgelehnt' }[a.status] || a.status;
+    const partnerUser = a.status === 'accepted' ? db.prepare("SELECT id FROM users WHERE email = ? AND role = 'partner'").get(a.email) : null;
     content += `
       <tr>
         <td>${a.first_name} ${a.last_name}</td>
@@ -598,7 +621,7 @@ router.get('/partners', (req, res) => {
         <td>${a.appointment_request || '-'}</td>
         <td><span class="badge badge-${a.status}">${statusLabel}</span></td>
         <td>
-          <form method="POST" action="/admin/partners/${a.id}" style="display:flex;gap:4px;">
+          <form method="POST" action="/admin/partners/${a.id}" style="display:flex;gap:4px;margin-bottom:6px;">
             <select name="status" style="padding:6px;border-radius:6px;border:1px solid var(--gray-300);font-size:0.8rem;">
               <option value="new" ${a.status === 'new' ? 'selected' : ''}>Neu</option>
               <option value="contacted" ${a.status === 'contacted' ? 'selected' : ''}>Kontaktiert</option>
@@ -607,6 +630,7 @@ router.get('/partners', (req, res) => {
             </select>
             <button type="submit" class="btn btn-outline btn-sm">Ändern</button>
           </form>
+          ${partnerUser ? `<a href="/admin/partners/manage/${partnerUser.id}" class="btn btn-primary btn-sm">Vertrag/Projekte verwalten</a>` : ''}
         </td>
       </tr>`;
   }
@@ -631,7 +655,7 @@ router.post('/partners/:id', (req, res) => {
     const crypto = require('crypto');
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(application.email);
     if (!existing) {
-      const tempPassword = Math.random().toString(36).slice(-10);
+      const tempPassword = generatePartnerPassword();
       const hash = bcrypt.hashSync(tempPassword, 10);
       const apiKey = 'lp_' + crypto.randomBytes(24).toString('hex');
       db.prepare(`
@@ -643,6 +667,77 @@ router.post('/partners/:id', (req, res) => {
   }
 
   res.redirect('/admin/partners');
+});
+
+// PARTNER - Vertragsstatus + Projekt-Freigabe verwalten. Templates/Upload
+// bleiben im Partner-Dashboard gesperrt, bis beides hier gesetzt ist
+// (siehe routes/partner.js getContractStatus/getApprovedProducts).
+router.get('/partners/manage/:userId', (req, res) => {
+  const db = getDb();
+  const user = db.prepare("SELECT * FROM users WHERE id = ? AND role = 'partner'").get(req.params.userId);
+  if (!user) return res.redirect('/admin/partners');
+
+  const products = db.prepare(`
+    SELECT lp.*, lc.name as category_name FROM lead_products lp
+    JOIN lead_categories lc ON lp.category_id = lc.id
+    WHERE lp.active = 1
+    ORDER BY lc.sort_order, lp.name
+  `).all();
+  const approvedIds = new Set(db.prepare('SELECT product_id FROM partner_approved_products WHERE user_id = ?').all(user.id).map(r => r.product_id));
+
+  const content = `
+    <h2 style="font-size:1.5rem;margin-bottom:8px;">Partner verwalten: ${user.first_name} ${user.last_name}</h2>
+    <p style="color:var(--gray-500);margin-bottom:24px;">${user.email}</p>
+
+    <div style="background:var(--white);border-radius:var(--radius);padding:24px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+      <h3 style="margin-bottom:16px;">Vertragsstatus</h3>
+      ${user.contract_signed_at
+        ? `<p style="color:var(--success);font-weight:700;margin-bottom:12px;">Vertrag unterschrieben am ${user.contract_signed_at}</p>
+           <form method="POST" action="/admin/partners/manage/${user.id}/contract"><input type="hidden" name="action" value="clear"><button type="submit" class="btn btn-outline btn-sm">Zurücksetzen (z.B. bei Irrtum)</button></form>`
+        : `<p style="color:var(--warning);font-weight:700;margin-bottom:12px;">Noch nicht als unterschrieben markiert - Partner sieht noch keine Liefertemplates/Upload.</p>
+           <form method="POST" action="/admin/partners/manage/${user.id}/contract"><input type="hidden" name="action" value="sign"><button type="submit" class="btn btn-primary">Vertrag jetzt als unterschrieben markieren</button></form>`
+      }
+    </div>
+
+    <div style="background:var(--white);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);">
+      <h3 style="margin-bottom:16px;">Freigegebene Projekte</h3>
+      <p style="color:var(--gray-500);margin-bottom:16px;font-size:0.9rem;">Nur hier angehakte Projekte erscheinen im Partner-Dashboard (Liefertemplate + Upload-Auswahl) - unabhängig davon, was bei der Bewerbung gewünscht wurde.</p>
+      <form method="POST" action="/admin/partners/manage/${user.id}/projects">
+        ${products.map(p => `
+          <label style="display:block;margin-bottom:8px;">
+            <input type="checkbox" name="product_ids" value="${p.id}" ${approvedIds.has(p.id) ? 'checked' : ''}>
+            ${p.category_name} &rarr; ${p.name}
+          </label>`).join('')}
+        <button type="submit" class="btn btn-primary" style="margin-top:12px;">Freigaben speichern</button>
+      </form>
+    </div>`;
+
+  renderAdmin(req, res, content, 'partners');
+});
+
+router.post('/partners/manage/:userId/contract', (req, res) => {
+  const db = getDb();
+  if (req.body.action === 'sign') {
+    db.prepare("UPDATE users SET contract_signed_at = datetime('now') WHERE id = ? AND role = 'partner'").run(req.params.userId);
+  } else {
+    db.prepare("UPDATE users SET contract_signed_at = NULL WHERE id = ? AND role = 'partner'").run(req.params.userId);
+  }
+  res.redirect(`/admin/partners/manage/${req.params.userId}`);
+});
+
+router.post('/partners/manage/:userId/projects', (req, res) => {
+  const db = getDb();
+  const user = db.prepare("SELECT id FROM users WHERE id = ? AND role = 'partner'").get(req.params.userId);
+  if (!user) return res.redirect('/admin/partners');
+
+  const productIds = (Array.isArray(req.body.product_ids) ? req.body.product_ids : (req.body.product_ids ? [req.body.product_ids] : []))
+    .map(id => parseInt(id)).filter(Boolean);
+
+  db.prepare('DELETE FROM partner_approved_products WHERE user_id = ?').run(user.id);
+  const insert = db.prepare('INSERT INTO partner_approved_products (user_id, product_id) VALUES (?, ?)');
+  for (const productId of productIds) insert.run(user.id, productId);
+
+  res.redirect(`/admin/partners/manage/${user.id}`);
 });
 
 // LEAD POOL - Overview
@@ -736,8 +831,8 @@ router.get('/pool/import', (req, res) => {
       <h3 style="margin-bottom:16px;">CSV-Import</h3>
       <p style="color:var(--gray-500);margin-bottom:16px;font-size:0.9rem;">
         CSV-Format (Semikolon-getrennt, mit oder ohne Kopfzeile):<br>
-        <code id="formatInfo">Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen</code><br>
-        <small>Dublettenprüfung: 1. Telefonnummer, 2. Firmenname (B2B) bzw. Name+Vorname+PLZ (B2C). Produktspezifische Zusatzspalten (falls vorhanden) werden in exakt der angezeigten Reihenfolge NACH den Standardspalten erwartet.</small>
+        <code id="formatInfo">Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen;Voicefile-Link</code><br>
+        <small>Dublettenprüfung: 1. Telefonnummer, 2. Firmenname (B2B) bzw. Name+Vorname+PLZ (B2C). <strong>Voicefile-Link ist Pflicht</strong> (direkter Link zur gehosteten Audiodatei, kein Upload) - erfolgreiche Zeilen landen in der QM-Warteschlange (/qm), nicht mehr direkt im Pool. Produktspezifische Zusatzspalten (falls vorhanden) werden in exakt der angezeigten Reihenfolge NACH dem Voicefile-Link erwartet.</small>
       </p>
       <form method="POST" action="/admin/pool/import" enctype="multipart/form-data">
         <div class="form-row">
@@ -751,7 +846,7 @@ router.get('/pool/import', (req, res) => {
           </div>
           <div class="form-group">
             <label>Produkt / Branche *</label>
-            <select name="product_id" required id="productSelect" onchange="var o=this.options[this.selectedIndex]; var t=o.getAttribute('data-leadtype'); var base = t==='b2b' ? 'Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen' : 'Nachname;Vorname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Geburtsdatum;Bemerkungen'; var extra = o.getAttribute('data-extrafields'); document.getElementById('formatInfo').textContent = extra ? base + ';' + extra : base; document.getElementById('typeLabel').textContent = t==='b2b' ? 'B2B' : 'B2C';">
+            <select name="product_id" required id="productSelect" onchange="var o=this.options[this.selectedIndex]; var t=o.getAttribute('data-leadtype'); var base = t==='b2b' ? 'Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen;Voicefile-Link' : 'Nachname;Vorname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Geburtsdatum;Bemerkungen;Voicefile-Link'; var extra = o.getAttribute('data-extrafields'); document.getElementById('formatInfo').textContent = extra ? base + ';' + extra : base; document.getElementById('typeLabel').textContent = t==='b2b' ? 'B2B' : 'B2C';">
               ${productOptions}
             </select>
           </div>

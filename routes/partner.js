@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const multer = require('multer');
+const bcrypt = require('bcrypt');
 const { getDb } = require('../database');
 const { requirePartner } = require('../middleware/auth');
 const { getVatForCountry, formatVatRate } = require('../lib/vat');
 const { sendPartnerApplicationNotification, sendPartnerWelcomeMail } = require('../lib/mailer');
+const { getDeliveryTemplate } = require('../lib/deliveryTemplate');
+const { PARTNER_PASSWORD_PATTERN, PARTNER_PASSWORD_HINWEIS } = require('../lib/passwordPolicy');
 
 const partnerUpload = multer({ dest: path.join(__dirname, '..', 'public', 'uploads', 'csv') });
 
@@ -25,12 +28,13 @@ function buildProjectTilesHtml(products) {
       : cat.name === 'Senioren-Produkte' ? ' theme-coral' : '';
     html += `<div class="category-group${themeClass}"><h3>${cat.icon} ${cat.name}</h3><div class="leads-grid">`;
     for (const p of catProducts) {
+      const paused = !!p.production_paused;
       html += `
-        <label class="lead-card project-tile">
-          <input type="checkbox" name="project_ids" value="${p.id}">
+        <label class="lead-card project-tile"${paused ? ' style="opacity:0.55;cursor:not-allowed;"' : ''}>
+          <input type="checkbox" name="project_ids" value="${p.id}"${paused ? ' disabled' : ''}>
           ${p.image_url ? `<div class="lead-card-image"><img src="${p.image_url}" alt="${p.name}" loading="lazy"></div>` : ''}
           <h4>${p.name}</h4>
-          <p class="lead-desc">${p.description || ''}</p>
+          ${paused ? '<p class="lead-desc" style="color:var(--warning);font-weight:600;">Aktuell pausiert - keine Produktion möglich</p>' : `<p class="lead-desc">${p.partner_description || p.description || ''}</p>`}
         </label>`;
     }
     html += '</div></div>';
@@ -56,6 +60,30 @@ const PARTNER_LEAD_STATUS = {
 };
 function leadStatusBadge(l) {
   return PARTNER_LEAD_STATUS[l.lead_status] || { statusLabel: l.lead_status, statusClass: 'badge-paid' };
+}
+
+// Freigabe-Status: Vertrag muss unterschrieben sein (contract_signed_at,
+// von Admin manuell nach Vertragsrücklauf gesetzt), BEVOR ein Partner
+// Liefertemplates sehen oder Daten hochladen kann - unabhängig vom
+// can_upload-Flag unten. Siehe [[project-leadarea]], Entscheidung 2026-10-21.
+function getContractStatus(userId) {
+  const db = getDb();
+  const user = db.prepare('SELECT contract_signed_at FROM users WHERE id = ?').get(userId);
+  return !!(user && user.contract_signed_at);
+}
+
+// Welche Projekte dieser Partner tatsächlich produzieren darf (Admin pflegt
+// das erst nach Vertragsunterschrift, siehe partner_approved_products) -
+// NICHT identisch mit den bei der Bewerbung gewünschten Projekten.
+function getApprovedProducts(userId) {
+  const db = getDb();
+  return db.prepare(`
+    SELECT lp.*, lc.name as category_name FROM partner_approved_products pap
+    JOIN lead_products lp ON lp.id = pap.product_id
+    JOIN lead_categories lc ON lp.category_id = lc.id
+    WHERE pap.user_id = ? AND lp.active = 1
+    ORDER BY lc.sort_order, lp.name
+  `).all(userId);
 }
 
 function canUpload(req) {
@@ -90,13 +118,13 @@ router.get('/partner', (req, res) => {
   });
 });
 
-router.post('/partner', (req, res) => {
-  const { company, first_name, last_name, street, house_number, postal_code, city, country, phone, email, tax_number, message, appointment_date, appointment_time, agb, newsletter } = req.body;
+router.post('/partner', async (req, res) => {
+  const { company, first_name, last_name, street, house_number, postal_code, city, country, phone, email, tax_number, message, appointment_date, appointment_time, password, password2, agb, newsletter } = req.body;
   const db = getDb();
   const products = db.prepare('SELECT * FROM lead_products WHERE active = 1').all();
   const projectTilesHtml = buildProjectTilesHtml(products);
 
-  if (!company || !first_name || !last_name || !street || !house_number || !postal_code || !city || !country || !phone || !email) {
+  if (!company || !first_name || !last_name || !street || !house_number || !postal_code || !city || !country || !phone || !email || !password) {
     const alertHtml = '<div class="alert alert-error">Bitte fülle alle Pflichtfelder aus.</div>';
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
   }
@@ -108,6 +136,22 @@ router.post('/partner', (req, res) => {
 
   if (!agb) {
     const alertHtml = '<div class="alert alert-error">Bitte akzeptiere die AGB.</div>';
+    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+  }
+
+  if (password !== password2) {
+    const alertHtml = '<div class="alert alert-error">Die Passwörter stimmen nicht überein.</div>';
+    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+  }
+
+  if (!PARTNER_PASSWORD_PATTERN.test(password)) {
+    const alertHtml = `<div class="alert alert-error">${PARTNER_PASSWORD_HINWEIS}</div>`;
+    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+  }
+
+  const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+  if (existingUser) {
+    const alertHtml = '<div class="alert alert-error">Diese E-Mail-Adresse ist bereits registriert. Bitte logge dich ein oder nutze eine andere E-Mail-Adresse.</div>';
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
   }
 
@@ -126,6 +170,20 @@ router.post('/partner', (req, res) => {
   const insertProject = db.prepare('INSERT INTO partner_application_projects (application_id, product_id) VALUES (?, ?)');
   for (const productId of projectIds) insertProject.run(applicationId, productId);
 
+  // Account wird direkt bei der Bewerbung mit dem selbst gewählten Passwort
+  // angelegt (nicht erst bei Admin-Freigabe) - Zugriff auf Leads/Dashboard-
+  // Inhalte bleibt trotzdem bis zur Freigabe gesperrt (contract_signed_at/
+  // can_upload/partner_approved_products, siehe getContractStatus oben).
+  // Vorher wurde bei Freigabe ein Zufallspasswort generiert, das nie an den
+  // Partner kommuniziert wurde (siehe routes/admin.js) - dieser Weg ersetzt das.
+  const hash = await bcrypt.hash(password, 10);
+  const crypto = require('crypto');
+  const apiKey = 'lp_' + crypto.randomBytes(24).toString('hex');
+  const { lastInsertRowid: userId } = db.prepare(`
+    INSERT INTO users (email, password_hash, first_name, last_name, phone, country, role, api_key)
+    VALUES (?, ?, ?, ?, ?, ?, 'partner', ?)
+  `).run(email, hash, first_name, last_name, phone, country, apiKey);
+
   const projectNames = projectIds.map(id => (products.find(p => p.id === id) || {}).name).filter(Boolean);
   sendPartnerApplicationNotification({
     company, firstName: first_name, lastName: last_name, phone, email, country, projectNames,
@@ -137,8 +195,12 @@ router.post('/partner', (req, res) => {
     stammdaten: { company, firstName: first_name, lastName: last_name, street, houseNumber: house_number, postalCode: postal_code, city, country, phone, email, taxNumber: tax_number },
   }).catch(err => console.error('[Partner-Welcome-Mail] Mail-Versand fehlgeschlagen:', err));
 
-  const alertHtml = '<div class="alert alert-success">Vielen Dank! Deine Bewerbung wurde erfolgreich eingereicht. Wir melden uns zu deinem Terminwunsch bei dir.</div>';
-  req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+  req.session.userId = userId;
+  req.session.email = email;
+  req.session.firstName = first_name;
+  req.session.lastName = last_name;
+  req.session.role = 'partner';
+  res.redirect('/partner/dashboard');
 });
 
 // PARTNER DASHBOARD
@@ -454,23 +516,44 @@ router.get('/partner/dashboard/imports', requirePartner, (req, res) => {
 // PARTNER - Leads einliefern (Upload-Seite)
 router.get('/partner/dashboard/upload', requirePartner, (req, res) => {
   if (!canUpload(req)) return res.redirect('/partner/dashboard');
-  const db = getDb();
-  const products = db.prepare(`
-    SELECT lp.*, lc.name as category_name FROM lead_products lp
-    JOIN lead_categories lc ON lp.category_id = lc.id
-    WHERE lp.active = 1
-    ORDER BY lc.sort_order, lp.name
-  `).all();
+
+  if (!getContractStatus(req.session.userId)) {
+    const content = `
+      <h2 style="font-size:1.5rem;margin-bottom:24px;">Leads einliefern</h2>
+      <div class="alert alert-warning">
+        Dein Vertrag wurde noch nicht als unterschrieben hinterlegt. Liefertemplates
+        und der Upload-Bereich werden freigeschaltet, sobald das erledigt ist - bitte
+        wende dich an deinen Ansprechpartner bei uns, falls du denkst, das sollte
+        schon der Fall sein.
+      </div>`;
+    return renderPartnerDashboard(req, res, content, 'upload');
+  }
+
+  const products = getApprovedProducts(req.session.userId);
+
+  if (products.length === 0) {
+    const content = `
+      <h2 style="font-size:1.5rem;margin-bottom:24px;">Leads einliefern</h2>
+      <div class="alert alert-warning">
+        Für dich sind aktuell noch keine Projekte freigegeben. Sobald das passiert
+        ist, erscheinen hier die passenden Liefertemplates.
+      </div>`;
+    return renderPartnerDashboard(req, res, content, 'upload');
+  }
 
   const deliveryFieldsByProduct = {};
-  for (const row of db.prepare('SELECT product_id, field_label FROM product_delivery_fields ORDER BY product_id, sort_order').all()) {
+  for (const row of getDb().prepare('SELECT product_id, field_label FROM product_delivery_fields ORDER BY product_id, sort_order').all()) {
     if (!deliveryFieldsByProduct[row.product_id]) deliveryFieldsByProduct[row.product_id] = [];
     deliveryFieldsByProduct[row.product_id].push(row.field_label);
   }
   let productOptions = products.map(p => `<option value="${p.id}" data-leadtype="${p.lead_type}" data-extrafields="${(deliveryFieldsByProduct[p.id] || []).join(';')}">${p.category_name} &rarr; ${p.name} (${p.lead_type === 'b2b' ? 'B2B' : 'B2C'})</option>`).join('');
 
+  const templateLinksHtml = products.map(p =>
+    `<a href="/partner/dashboard/template/${p.id}" class="btn btn-outline btn-sm" style="margin:4px 4px 4px 0;">Vorlage: ${p.name} herunterladen</a>`
+  ).join('');
+
   const alertHtml = req.query.success ? `<div class="alert alert-success">
-    Import abgeschlossen: <strong>${req.query.imported || 0}</strong> Leads importiert &nbsp;|&nbsp;
+    Import abgeschlossen: <strong>${req.query.imported || 0}</strong> Leads in QM-Prüfung &nbsp;|&nbsp;
     <strong>${req.query.duplicates || 0}</strong> Dubletten &nbsp;|&nbsp;
     <strong>${req.query.blacklist || 0}</strong> Blacklist &nbsp;|&nbsp;
     <strong>${req.query.invalid || 0}</strong> ungültig
@@ -479,6 +562,10 @@ router.get('/partner/dashboard/upload', requirePartner, (req, res) => {
   const content = `
     <h2 style="font-size:1.5rem;margin-bottom:24px;">Leads einliefern</h2>
     ${alertHtml}
+    <div style="background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius);padding:24px;margin-bottom:24px;">
+      <h3 style="margin-bottom:16px;color:var(--white);">Liefertemplates deiner freigegebenen Projekte</h3>
+      ${templateLinksHtml}
+    </div>
     <div style="background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius);padding:24px;">
       <h3 style="margin-bottom:16px;color:var(--white);">CSV-Upload</h3>
       <div class="alert alert-warning" style="margin-bottom:16px;">
@@ -486,14 +573,14 @@ router.get('/partner/dashboard/upload', requirePartner, (req, res) => {
       </div>
       <p style="color:var(--gray-300);margin-bottom:16px;font-size:0.9rem;">
         CSV-Format (Semikolon-getrennt, mit oder ohne Kopfzeile):<br>
-        <code id="formatInfo">Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen</code><br>
-        <small>Nur deutsche Leads (PLZ 5-stellig). Dubletten werden automatisch erkannt. Produktspezifische Zusatzspalten (falls vorhanden) bitte in der angezeigten Reihenfolge NACH den Standardspalten anhängen.</small>
+        <code id="formatInfo">${products[0].lead_type === 'b2b' ? 'Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen;Voicefile-Link' : 'Nachname;Vorname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Geburtsdatum;Bemerkungen;Voicefile-Link'}</code><br>
+        <small>Nur deutsche Leads (PLZ 5-stellig). Dubletten werden automatisch erkannt. <strong>Voicefile-Link ist Pflicht:</strong> direkter Link zur bereits gehosteten Audiodatei (kein Datei-Upload nötig) - Zeilen ohne gültigen Link (http/https) werden als ungültig abgelehnt. Nutze am besten die Vorlage oben statt die Spalten selbst nachzubauen.</small>
       </p>
       <form method="POST" action="/partner/dashboard/upload" enctype="multipart/form-data">
         <div class="form-row">
           <div class="form-group">
             <label>Produkt / Branche *</label>
-            <select name="product_id" required onchange="var o=this.options[this.selectedIndex]; var t=o.getAttribute('data-leadtype'); var base = t==='b2b' ? 'Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen' : 'Nachname;Vorname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Geburtsdatum;Bemerkungen'; var extra = o.getAttribute('data-extrafields'); document.getElementById('formatInfo').textContent = extra ? base + ';' + extra : base;">
+            <select name="product_id" required onchange="var o=this.options[this.selectedIndex]; var t=o.getAttribute('data-leadtype'); var base = t==='b2b' ? 'Firmenname;Nachname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Bemerkungen;Voicefile-Link' : 'Nachname;Vorname;Strasse;Hausnummer;PLZ;Ort;Telefon;Email;Geburtsdatum;Bemerkungen;Voicefile-Link'; var extra = o.getAttribute('data-extrafields'); document.getElementById('formatInfo').textContent = extra ? base + ';' + extra : base;">
               ${productOptions}
             </select>
           </div>
@@ -509,12 +596,36 @@ router.get('/partner/dashboard/upload', requirePartner, (req, res) => {
   renderPartnerDashboard(req, res, content, 'upload');
 });
 
+// PARTNER - Liefertemplate herunterladen (nur fuer freigegebene Projekte,
+// nur nach Vertragsunterschrift - siehe getContractStatus/getApprovedProducts).
+router.get('/partner/dashboard/template/:productId', requirePartner, (req, res) => {
+  if (!getContractStatus(req.session.userId)) return res.redirect('/partner/dashboard/upload');
+
+  const approved = getApprovedProducts(req.session.userId);
+  const productId = parseInt(req.params.productId);
+  const product = approved.find(p => p.id === productId);
+  if (!product) return res.redirect('/partner/dashboard/upload');
+
+  const template = getDeliveryTemplate(productId);
+  if (!template) return res.redirect('/partner/dashboard/upload');
+
+  const filename = `Liefertemplate_${template.product.name.replace(/[^a-zA-Z0-9]+/g, '_')}.csv`;
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(template.header + '\r\n');
+});
+
 // PARTNER - CSV Upload Handler
 const { processImport } = require('../lib/importLeads');
 
 router.post('/partner/dashboard/upload', requirePartner, partnerUpload.single('csvfile'), (req, res) => {
   if (!canUpload(req)) return res.redirect('/partner/dashboard');
+  if (!getContractStatus(req.session.userId)) return res.redirect('/partner/dashboard/upload');
   if (!req.file) return res.redirect('/partner/dashboard/upload');
+
+  const productId = parseInt(req.body.product_id);
+  const isApproved = getApprovedProducts(req.session.userId).some(p => p.id === productId);
+  if (!isApproved) { try { require('fs').unlinkSync(req.file.path); } catch (_) {} return res.redirect('/partner/dashboard/upload'); }
 
   const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.session.userId);
@@ -523,7 +634,7 @@ router.post('/partner/dashboard/upload', requirePartner, partnerUpload.single('c
   const result = processImport({
     filePath: req.file.path,
     originalFilename: req.file.originalname,
-    productId: parseInt(req.body.product_id),
+    productId,
     partnerUserId: req.session.userId,
     supplierName,
     maxAssignments: 3,

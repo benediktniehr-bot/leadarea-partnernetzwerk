@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const { getDb } = require('../database');
 const { requireQm, requireQmLead } = require('../middleware/auth');
-const { getRecordingFilePath } = require('../lib/recordings');
+const { getRecordingFilePath, isVoiceLink } = require('../lib/recordings');
 const { pushLeadToMulticall } = require('../lib/multicallPush');
 
 router.use(requireQm);
@@ -138,6 +138,9 @@ router.get('/voicefile/:leadId', (req, res) => {
   const db = getDb();
   const rec = db.prepare('SELECT voice_file FROM lead_recordings WHERE pool_lead_id = ? ORDER BY created_at DESC LIMIT 1').get(req.params.leadId);
   if (!rec) return res.status(404).end();
+  // CSV-Partner liefern einen Link zur bereits gehosteten Datei statt eines
+  // Uploads - dann direkt dorthin weiterleiten statt lokal zu suchen.
+  if (isVoiceLink(rec.voice_file)) return res.redirect(rec.voice_file);
   res.sendFile(getRecordingFilePath(rec.voice_file));
 });
 
