@@ -10,7 +10,8 @@ const { sendPartnerApplicationNotification, sendPartnerWelcomeMail } = require('
 const { getDeliveryTemplate } = require('../lib/deliveryTemplate');
 const { PARTNER_PASSWORD_PATTERN, PARTNER_PASSWORD_HINWEIS } = require('../lib/passwordPolicy');
 
-const partnerUpload = multer({ dest: path.join(__dirname, '..', 'public', 'uploads', 'csv') });
+const UPLOADS_BASE = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'public', 'uploads');
+const partnerUpload = multer({ dest: path.join(UPLOADS_BASE, 'csv') });
 
 // Projekt-Kacheln auf der Partner-LeadArea-Bewerbungsseite: gleiche Kategorien/
 // Produkte wie der Marktplatz, aber ohne Preis und als Checkbox-Mehrfachauswahl

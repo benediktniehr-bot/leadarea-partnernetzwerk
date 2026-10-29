@@ -8,8 +8,9 @@ const { processImport, normalizePhone, getMissingFields, isValidPhone, isValidEm
 const { getBundeslandForPlz } = require('../lib/plzBundesland');
 const { saveRecording } = require('../lib/recordings');
 
-const apiUpload = multer({ dest: path.join(__dirname, '..', 'public', 'uploads', 'csv') });
-const liveLeadUpload = multer({ dest: path.join(__dirname, '..', 'public', 'uploads', 'tmp-voicefiles'), limits: { fileSize: 25 * 1024 * 1024 } });
+const UPLOADS_BASE = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'public', 'uploads');
+const apiUpload = multer({ dest: path.join(UPLOADS_BASE, 'csv') });
+const liveLeadUpload = multer({ dest: path.join(UPLOADS_BASE, 'tmp-voicefiles'), limits: { fileSize: 25 * 1024 * 1024 } });
 
 function requireApiKey(req, res, next) {
   const apiKey = req.headers['x-api-key'] || req.query.api_key;

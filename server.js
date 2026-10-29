@@ -7,9 +7,21 @@ const { initializeDatabase } = require('./database');
 const { attachUser } = require('./middleware/auth');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable is required');
+}
 const DEFAULT_META_DESCRIPTION = 'Partner-LeadArea: Werde Produktionspartner und profitiere von langjährigen Kooperationen, einem großen Netzwerk und unserem Know-how.';
+
+for (const dir of [
+  process.env.UPLOADS_DIR ? path.join(process.env.UPLOADS_DIR, 'voicefiles') : path.join(__dirname, 'public', 'uploads', 'voicefiles'),
+  process.env.UPLOADS_DIR ? path.join(process.env.UPLOADS_DIR, 'csv') : path.join(__dirname, 'public', 'uploads', 'csv'),
+  process.env.UPLOADS_DIR ? path.join(process.env.UPLOADS_DIR, 'tmp-voicefiles') : path.join(__dirname, 'public', 'uploads', 'tmp-voicefiles'),
+]) {
+  fs.mkdirSync(dir, { recursive: true });
+}
 
 initializeDatabase();
 
@@ -24,8 +36,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  store: new SQLiteStore({ db: 'sessions.db', dir: __dirname }),
-  secret: 'leadpuls-secret-key-change-in-production',
+  store: new SQLiteStore({ db: 'sessions.db', dir: process.env.DATA_DIR || __dirname }),
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }

@@ -7,8 +7,10 @@ const { requireAdmin } = require('../middleware/auth');
 const { assignLeadsToItem } = require('../lib/deliverLeads');
 const { markOrderPaid } = require('../lib/orderPayment');
 
+const UPLOADS_BASE = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'public', 'uploads');
+
 const storage = multer.diskStorage({
-  destination: path.join(__dirname, '..', 'public', 'uploads', 'voicefiles'),
+  destination: path.join(UPLOADS_BASE, 'voicefiles'),
   filename: (req, file, cb) => {
     const unique = Date.now() + '-' + Math.round(Math.random() * 1e6);
     cb(null, unique + path.extname(file.originalname));
@@ -1247,7 +1249,7 @@ router.post('/pool/lead/:leadId/status', (req, res) => {
 });
 
 // LEAD POOL - CSV Import handler
-const csvUpload = multer({ dest: path.join(__dirname, '..', 'public', 'uploads', 'csv') });
+const csvUpload = multer({ dest: path.join(UPLOADS_BASE, 'csv') });
 const { processImport } = require('../lib/importLeads');
 
 router.post('/pool/import', csvUpload.single('csvfile'), (req, res) => {
