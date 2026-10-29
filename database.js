@@ -258,6 +258,7 @@ function initializeDatabase() {
     "ALTER TABLE users ADD COLUMN reset_token TEXT",
     "ALTER TABLE users ADD COLUMN reset_token_expires DATETIME",
     "UPDATE lead_categories SET name = 'Automaten' WHERE name = 'Vending & Automaten'",
+    "UPDATE lead_products SET production_paused = 1 WHERE name IN ('Wasserspender', 'Snackautomaten')",
   ];
 
   db.exec(`
