@@ -119,7 +119,7 @@ function renderPage(res, viewName, data = {}) {
          <a href="/logout" class="nav-link">Logout</a>
        </div>`
     : `<a href="/login" class="nav-link">Login</a>
-       <a href="/register" class="btn btn-primary btn-sm">Registrieren</a>`;
+       <a href="/partner#bewerbung" class="btn btn-primary btn-sm">Registrieren</a>`;
 
   // Partner-LeadArea ist strikt vom Marktplatz getrennt: ein Partner darf nie
   // sehen, zu welchem Preis "seine" Leads dort verkauft werden - deshalb auf
