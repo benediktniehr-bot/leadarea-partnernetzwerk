@@ -332,8 +332,8 @@ function initializeDatabase() {
   }
 
   backfillBundesland(db);
-  seedDeliveryFields(db);
   seedData(db);
+  seedDeliveryFields(db);
 }
 
 // Produktspezifische Zusatzfelder (Liefertemplates) fürs CC bei der Datenproduktion.
@@ -458,11 +458,23 @@ function seedData(db) {
     insertProduct.run(cat4, 'Treppenlift', 'Telefonisch qualifizierte Leads mit bestätigtem Interesse an Treppenliften. Inkl. Gesprächsaufnahme.', 119.90, 'b2c');
     insertProduct.run(cat4, 'Immobilien', 'Telefonisch qualifizierte Leads von Immobilienverkäufern. Inkl. Gesprächsaufnahme.', 149.90, 'b2c');
 
-    const adminHash = bcrypt.hashSync('admin123', 10);
-    db.prepare(`
-      INSERT OR IGNORE INTO users (email, password_hash, first_name, last_name, role)
-      VALUES (?, ?, ?, ?, ?)
-    `).run('admin@leadpuls.de', adminHash, 'Admin', 'Leadpuls', 'admin');
+    // Senioren-Produkte: nur partnerseitig genutzt (Käuferseite/Marktplatz
+    // existiert nicht), Preis daher Platzhalter 0 - Provision für
+    // Einlieferer wird nachträglich separat eingerichtet.
+    const cat5 = insertCategory.run('Senioren-Produkte', '🦽', 5).lastInsertRowid;
+    insertProduct.run(cat5, 'Alltagshilfe', 'Leads mit Interesse an Alltagshilfe.', 0, 'b2c');
+    insertProduct.run(cat5, 'Badumbau', 'Leads mit Interesse an altersgerechtem Badumbau.', 0, 'b2c');
+    insertProduct.run(cat5, 'Elektrorollstuhl', 'Leads mit Interesse an Elektrorollstühlen.', 0, 'b2c');
+    insertProduct.run(cat5, 'Badewannenlift', 'Leads mit Interesse an Badewannenliften.', 0, 'b2c');
+    insertProduct.run(cat5, 'Elektromobil', 'Leads mit Interesse an Elektromobilen.', 0, 'b2c');
+
+    if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+      const adminHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
+      db.prepare(`
+        INSERT OR IGNORE INTO users (email, password_hash, first_name, last_name, role)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(process.env.ADMIN_EMAIL, adminHash, 'Admin', 'LeadArea', 'admin');
+    }
   });
 
   seed();
