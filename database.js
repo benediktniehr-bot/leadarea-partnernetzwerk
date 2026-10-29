@@ -257,6 +257,7 @@ function initializeDatabase() {
     "ALTER TABLE lead_products ADD COLUMN partner_description TEXT",
     "ALTER TABLE users ADD COLUMN reset_token TEXT",
     "ALTER TABLE users ADD COLUMN reset_token_expires DATETIME",
+    "UPDATE lead_categories SET name = 'Automaten' WHERE name = 'Vending & Automaten'",
   ];
 
   db.exec(`
@@ -442,7 +443,7 @@ function seedData(db) {
     insertProduct.run(cat1, 'Photovoltaik', 'Telefonisch qualifizierte Leads mit bestätigtem Interesse an Photovoltaik-Anlagen. Inkl. Gesprächsaufnahme.', 49.90, 'b2c');
     insertProduct.run(cat1, 'Wärmepumpe', 'Telefonisch qualifizierte Leads mit bestätigtem Interesse an Wärmepumpen. Inkl. Gesprächsaufnahme.', 49.90, 'b2c');
 
-    const cat2 = insertCategory.run('Vending & Automaten', '☕', 2).lastInsertRowid;
+    const cat2 = insertCategory.run('Automaten', '☕', 2).lastInsertRowid;
     insertProduct.run(cat2, 'Kaffeevollautomaten', 'Telefonisch qualifizierte Leads von Unternehmen mit Interesse an Kaffeevollautomaten. Inkl. Gesprächsaufnahme.', 59.90, 'b2b');
     insertProduct.run(cat2, 'Snackautomaten', 'Telefonisch qualifizierte Leads von Unternehmen mit Interesse an Snackautomaten. Inkl. Gesprächsaufnahme.', 59.90, 'b2b');
     insertProduct.run(cat2, 'Wasserspender', 'Telefonisch qualifizierte Leads von Unternehmen mit Interesse an Wasserspendern. Inkl. Gesprächsaufnahme.', 59.90, 'b2b');

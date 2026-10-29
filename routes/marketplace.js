@@ -40,7 +40,7 @@ function buildCategoriesHtml(products, showActions, availability = {}) {
     const catProducts = products.filter(p => p.category_id === cat.id);
     if (catProducts.length === 0) continue;
 
-    const themeClass = cat.name === 'Vending & Automaten' ? ' theme-amber'
+    const themeClass = cat.name === 'Automaten' ? ' theme-amber'
       : cat.name === 'Senioren-Produkte' ? ' theme-coral' : '';
     html += `<div class="category-group${themeClass}"><h3>${cat.icon} ${cat.name}</h3><div class="leads-grid">`;
     for (const p of catProducts) {
