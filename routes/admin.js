@@ -428,7 +428,22 @@ router.get('/users', (req, res) => {
   const db = getDb();
   const users = db.prepare('SELECT * FROM users ORDER BY created_at DESC').all();
 
+  const alerts = {
+    invited: '<div class="alert alert-success">Admin-Zugang angelegt, Freigabe-Mail wurde verschickt.</div>',
+    promoted: '<div class="alert alert-success">Bestehender Account wurde zum Admin gemacht.</div>',
+    exists_error: '<div class="alert alert-error">Diese E-Mail-Adresse ist schon registriert und konnte nicht automatisch hochgestuft werden.</div>',
+    missing_fields: '<div class="alert alert-error">Bitte E-Mail, Vor- und Nachname angeben.</div>',
+  };
+
   let content = '<h2 style="font-size:1.5rem;margin-bottom:24px;">Nutzer</h2>';
+  content += alerts[req.query.msg] || '';
+  content += `
+    <form method="POST" action="/admin/users" style="display:flex;gap:12px;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;">
+      <div><label style="display:block;font-size:0.85rem;margin-bottom:4px;">Vorname</label><input type="text" name="first_name" required></div>
+      <div><label style="display:block;font-size:0.85rem;margin-bottom:4px;">Nachname</label><input type="text" name="last_name" required></div>
+      <div><label style="display:block;font-size:0.85rem;margin-bottom:4px;">E-Mail</label><input type="email" name="email" required></div>
+      <button type="submit" class="btn btn-primary">Admin einladen</button>
+    </form>`;
   content += '<table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Rolle</th><th>Registriert</th></tr></thead><tbody>';
 
   for (const u of users) {
@@ -445,6 +460,41 @@ router.get('/users', (req, res) => {
   content += '</tbody></table>';
 
   renderAdmin(req, res, content, 'users');
+});
+
+// Neuen Admin einladen: existiert die E-Mail schon als Nutzer, wird der
+// bestehende Account direkt zum Admin hochgestuft (kein doppeltes Passwort,
+// kein Mailversand nötig - er kann sich ja schon einloggen). Existiert sie
+// noch nicht, wird ein neuer Account angelegt, der sich das Passwort selbst
+// über den Freigabe-Link vergibt (identischer Mechanismus wie bei der
+// Partner-Freigabe oben, siehe POST /partners/:id).
+router.post('/users', (req, res) => {
+  const db = getDb();
+  const bcrypt = require('bcrypt');
+  const crypto = require('crypto');
+  const { email, first_name, last_name } = req.body;
+  if (!email || !first_name || !last_name) return res.redirect('/admin/users?msg=missing_fields');
+
+  const existing = db.prepare('SELECT id, role FROM users WHERE email = ?').get(email);
+  if (existing) {
+    db.prepare("UPDATE users SET role = 'admin' WHERE id = ?").run(existing.id);
+    return res.redirect('/admin/users?msg=promoted');
+  }
+
+  const tempPassword = generatePartnerPassword();
+  const hash = bcrypt.hashSync(tempPassword, 10);
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  db.prepare(`
+    INSERT INTO users (email, password_hash, first_name, last_name, role, reset_token, reset_token_expires)
+    VALUES (?, ?, ?, ?, 'admin', ?, ?)
+  `).run(email, hash, first_name, last_name, token, expires);
+
+  const { sendAdminAccountActivationMail } = require('../lib/mailer');
+  sendAdminAccountActivationMail({ toEmail: email, firstName: first_name, resetToken: token })
+    .catch(err => console.error('[Admin-Freigabe-Mail] Mail-Versand fehlgeschlagen:', err));
+
+  res.redirect('/admin/users?msg=invited');
 });
 
 // LEADS MANAGEMENT
