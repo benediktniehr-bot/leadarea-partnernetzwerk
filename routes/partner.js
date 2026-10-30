@@ -171,8 +171,8 @@ router.post('/partner', async (req, res) => {
   }).catch(err => console.error('[Partner-Bewerbung] Mail-Versand fehlgeschlagen:', err));
 
   sendPartnerWelcomeMail({
-    toEmail: email, firstName: first_name, company,
-    stammdaten: { company, firstName: first_name, lastName: last_name, street, houseNumber: house_number, postalCode: postal_code, city, country, phone, email, taxNumber: tax_number },
+    toEmail: email, firstName: first_name, company, phone,
+    appointmentRequest: appointment_request,
   }).catch(err => console.error('[Partner-Welcome-Mail] Mail-Versand fehlgeschlagen:', err));
 
   const alertHtml = '<div class="alert alert-success">Danke für deine Bewerbung! Wir haben dir eine E-Mail mit den nächsten Schritten geschickt und melden uns zeitnah bei dir für ein persönliches Gespräch.</div>';
