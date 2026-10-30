@@ -3,7 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
-const { initializeDatabase } = require('./database');
+const { initializeDatabase, getDb } = require('./database');
 const { attachUser } = require('./middleware/auth');
 
 const app = express();
@@ -111,11 +111,20 @@ function renderPage(res, viewName, data = {}) {
   const dashboardLink = allData.user && allData.user.role === 'partner' ? '/partner/dashboard'
     : allData.user && ['qm_lead', 'qm_agent'].includes(allData.user.role) ? '/qm'
     : '/dashboard';
+  // Rote Glocke oben rechts: zeigt die Anzahl noch ungesehener Partner-
+  // Bewerbungen (viewed_at IS NULL) - nur fuer Admins berechnet, um die
+  // DB-Abfrage nicht bei jedem Request fuer alle Nutzer auszufuehren.
+  const newApplicationsCount = allData.user && allData.user.role === 'admin'
+    ? getDb().prepare("SELECT COUNT(*) as c FROM partner_applications WHERE viewed_at IS NULL").get().c
+    : 0;
+  const adminBell = allData.user && allData.user.role === 'admin'
+    ? `<a href="/admin/partners" class="bell-link" title="Neue Partner-Bewerbungen">🔔${newApplicationsCount > 0 ? `<span class="notify-badge">${newApplicationsCount}</span>` : ''}</a>`
+    : '';
   const navUser = allData.user
     ? `<div class="user-menu">
          <span class="user-greeting">Hallo, ${allData.user.firstName}</span>
          <a href="${dashboardLink}" class="nav-link">Dashboard</a>
-         ${allData.user.role === 'admin' ? '<a href="/admin" class="nav-link">Admin</a>' : ''}
+         ${allData.user.role === 'admin' ? `<a href="/admin" class="nav-link">Admin</a>${adminBell}` : ''}
          <a href="/logout" class="nav-link">Logout</a>
        </div>`
     : `<a href="/login" class="nav-link">Login</a>

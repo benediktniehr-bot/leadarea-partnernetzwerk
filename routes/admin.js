@@ -70,9 +70,11 @@ function csvEscape(val) {
 }
 
 function renderAdmin(req, res, content, activeTab) {
+  const newApplicationsCount = getDb().prepare("SELECT COUNT(*) as c FROM partner_applications WHERE viewed_at IS NULL").get().c;
   req.app.locals.renderPage(res, 'admin/index.html', {
     pageTitle: 'Admin',
     adminContent: content,
+    newApplicationsBadge: newApplicationsCount > 0 ? `<span class="nav-badge">${newApplicationsCount}</span>` : '',
     activeOverview: activeTab === 'overview' ? 'active' : '',
     activeProducts: activeTab === 'products' ? 'active' : '',
     activeOrders: activeTab === 'orders' ? 'active' : '',
@@ -645,6 +647,9 @@ router.post('/reclamations/:id', (req, res) => {
 // PARTNERS
 router.get('/partners', (req, res) => {
   const db = getDb();
+  // Oeffnen dieser Liste gilt als "gesehen" - loescht die rote Benachrichtigung
+  // (Glocke oben + Sidebar-Badge) fuer alle bisher ungesehenen Bewerbungen.
+  db.prepare('UPDATE partner_applications SET viewed_at = CURRENT_TIMESTAMP WHERE viewed_at IS NULL').run();
   const applications = db.prepare('SELECT * FROM partner_applications ORDER BY created_at DESC').all();
   const projectsByApplication = {};
   for (const row of db.prepare(`

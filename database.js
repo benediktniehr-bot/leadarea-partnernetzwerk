@@ -333,6 +333,23 @@ function initializeDatabase() {
     try { db.exec(sql); } catch (_) {}
   }
 
+  // Eigener Block statt im migrations-Array oben: beim erstmaligen Hinzufuegen
+  // der Spalte muessen alle BISHERIGEN Bewerbungen als "gesehen" gelten, sonst
+  // wuerde die neue rote Benachrichtigung bei jedem Bestandsdatensatz
+  // aufleuchten. Ein einfaches "WHERE viewed_at IS NULL"-UPDATE im
+  // migrations-Array waere dagegen NICHT einmalig, sondern wuerde bei jedem
+  // Server-Neustart (z.B. nach jedem Deploy) auch ECHT neue, noch ungesehene
+  // Bewerbungen faelschlich als gesehen markieren und die Benachrichtigung
+  // sofort wieder loeschen.
+  let addedViewedAt = false;
+  try {
+    db.exec('ALTER TABLE partner_applications ADD COLUMN viewed_at DATETIME');
+    addedViewedAt = true;
+  } catch (_) {}
+  if (addedViewedAt) {
+    db.exec('UPDATE partner_applications SET viewed_at = created_at WHERE viewed_at IS NULL');
+  }
+
   backfillBundesland(db);
   seedData(db);
   seedDeliveryFields(db);

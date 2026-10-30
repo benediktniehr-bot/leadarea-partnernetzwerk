@@ -124,6 +124,27 @@ nav { display: flex; align-items: center; gap: 24px; }
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
+.bell-link { position: relative; font-size: 1.2rem; padding: 4px; }
+.notify-badge {
+  position: absolute;
+  top: -4px; right: -8px;
+  background: var(--error);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-badge {
+  background: var(--error);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
 .mobile-toggle {
   display: none;
   background: none;
