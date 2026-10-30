@@ -89,6 +89,7 @@ function renderAdmin(req, res, content, activeTab) {
     activeWiderruf: activeTab === 'widerruf' ? 'active' : '',
     activeProvisionen: activeTab === 'provisionen' ? 'active' : '',
     activeQm: activeTab === 'qm' ? 'active' : '',
+    activeLoginLog: activeTab === 'loginlog' ? 'active' : '',
   });
 }
 
@@ -2051,6 +2052,59 @@ router.get('/provisionen/export', (req, res) => {
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="lead-reporting_${from}_${to}.csv"`);
+  res.send('﻿' + csv);
+});
+
+// LOGIN-PROTOKOLL - Nachweis, wer wann eingeloggt war (z.B. gegenueber
+// Lieferanten/Partnern), nicht zu verwechseln mit qm_sessions (dient nur
+// der QM-Verguetung).
+const ROLE_LABELS = { admin: 'Admin', partner: 'Partner', qm_lead: 'QM-Teamleitung', qm_agent: 'QM', user: 'Käufer' };
+
+router.get('/login-log', (req, res) => {
+  const db = getDb();
+  const rows = db.prepare(`
+    SELECT ll.login_at, ll.logout_at, u.first_name, u.last_name, u.email, ll.role
+    FROM login_log ll JOIN users u ON u.id = ll.user_id
+    ORDER BY ll.login_at DESC LIMIT 500
+  `).all();
+
+  let content = `<h2 style="font-size:1.5rem;margin-bottom:8px;">Login-Protokoll</h2>
+    <p style="color:var(--gray-300);margin-bottom:24px;">Letzte 500 Logins aller Rollen. <a href="/admin/login-log/export" class="btn btn-outline btn-sm">Als CSV exportieren</a></p>
+    <table class="data-table"><thead><tr><th>Name</th><th>E-Mail</th><th>Rolle</th><th>Login</th><th>Logout</th></tr></thead><tbody>`;
+  for (const r of rows) {
+    content += `
+      <tr>
+        <td>${r.first_name} ${r.last_name}</td>
+        <td>${r.email}</td>
+        <td>${ROLE_LABELS[r.role] || r.role}</td>
+        <td>${new Date(r.login_at).toLocaleString('de-DE')}</td>
+        <td>${r.logout_at ? new Date(r.logout_at).toLocaleString('de-DE') : '-'}</td>
+      </tr>`;
+  }
+  content += '</tbody></table>';
+
+  renderAdmin(req, res, content, 'loginlog');
+});
+
+router.get('/login-log/export', (req, res) => {
+  const db = getDb();
+  const rows = db.prepare(`
+    SELECT ll.login_at, ll.logout_at, u.first_name, u.last_name, u.email, ll.role
+    FROM login_log ll JOIN users u ON u.id = ll.user_id
+    ORDER BY ll.login_at DESC
+  `).all();
+
+  let csv = 'Name;Email;Rolle;Login;Logout\n';
+  for (const r of rows) {
+    csv += [
+      `${r.first_name} ${r.last_name}`, r.email, ROLE_LABELS[r.role] || r.role,
+      new Date(r.login_at).toLocaleString('de-DE'),
+      r.logout_at ? new Date(r.logout_at).toLocaleString('de-DE') : '',
+    ].map(csvEscape).join(';') + '\n';
+  }
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="login-protokoll.csv"');
   res.send('﻿' + csv);
 });
 

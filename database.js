@@ -295,6 +295,18 @@ function initializeDatabase() {
       multicall_vendor_shortcut TEXT NOT NULL,
       FOREIGN KEY (product_id) REFERENCES lead_products(id)
     );
+    -- Allgemeines Login-Protokoll fuer ALLE Rollen (Admin, Partner, QM,
+    -- Kaeufer) - Nachweis, wer wann eingeloggt war (z.B. gegenueber
+    -- Lieferanten/Partnern). Getrennt von qm_sessions oben, das nur der
+    -- QM-Verguetung dient.
+    CREATE TABLE IF NOT EXISTS login_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      role TEXT NOT NULL,
+      login_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      logout_at DATETIME,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
     -- Online-Zeit-Tracking je QM-Mitarbeiter (Andrea + ihr Team), Grundlage
     -- fuer deren Verguetung. Eine Zeile pro Login-Session.
     CREATE TABLE IF NOT EXISTS qm_sessions (

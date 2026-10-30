@@ -124,6 +124,7 @@ router.post('/login', async (req, res) => {
   req.session.firstName = user.first_name;
   req.session.lastName = user.last_name;
   req.session.role = user.role;
+  req.session.loginLogId = db.prepare('INSERT INTO login_log (user_id, role) VALUES (?, ?)').run(user.id, user.role).lastInsertRowid;
 
   redirectForRole(res, user.role);
 });
@@ -132,6 +133,10 @@ router.get('/logout', (req, res) => {
   if (req.session && req.session.qmSessionId) {
     const { getDb } = require('../database');
     getDb().prepare('UPDATE qm_sessions SET logout_at = CURRENT_TIMESTAMP WHERE id = ?').run(req.session.qmSessionId);
+  }
+  if (req.session && req.session.loginLogId) {
+    const { getDb } = require('../database');
+    getDb().prepare('UPDATE login_log SET logout_at = CURRENT_TIMESTAMP WHERE id = ?').run(req.session.loginLogId);
   }
   req.session.destroy(() => {
     res.redirect('/');
