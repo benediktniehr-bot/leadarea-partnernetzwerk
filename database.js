@@ -474,13 +474,18 @@ function seedData(db) {
     insertProduct.run(cat3, 'Videoüberwachung', 'Telefonisch qualifizierte Leads mit bestätigtem Interesse an Videoüberwachung. Inkl. Gesprächsaufnahme.', 39.90, 'b2c');
 
     const cat4 = insertCategory.run('Immobilien', '🏢', 4).lastInsertRowid;
-    insertProduct.run(cat4, 'Treppenlift', 'Telefonisch qualifizierte Leads mit bestätigtem Interesse an Treppenliften. Inkl. Gesprächsaufnahme.', 119.90, 'b2c');
     insertProduct.run(cat4, 'Immobilien', 'Telefonisch qualifizierte Leads von Immobilienverkäufern. Inkl. Gesprächsaufnahme.', 149.90, 'b2c');
 
     // Senioren-Produkte: nur partnerseitig genutzt (Käuferseite/Marktplatz
     // existiert nicht), Preis daher Platzhalter 0 - Provision für
     // Einlieferer wird nachträglich separat eingerichtet.
     const cat5 = insertCategory.run('Senioren-Produkte', '🦽', 5).lastInsertRowid;
+    // Treppenlift gehört inhaltlich eher hierher als zu Immobilien
+    // (altersbedingter Bedarf, nicht Immobilienverkauf) - am 2026-07-24 nach
+    // Ruecksprache mit Frank bereits einmal hierher verschoben, aber nur
+    // direkt in der DB, nie im Seed-Code - ging beim Render-Neuaufsetzen
+    // (Oktober 2026, frische DB) wieder verloren. Diesmal auch hier fixiert.
+    insertProduct.run(cat5, 'Treppenlift', 'Telefonisch qualifizierte Leads mit bestätigtem Interesse an Treppenliften. Inkl. Gesprächsaufnahme.', 119.90, 'b2c');
     insertProduct.run(cat5, 'Alltagshilfe', 'Leads mit Interesse an Alltagshilfe.', 0, 'b2c');
     insertProduct.run(cat5, 'Badumbau', 'Leads mit Interesse an altersgerechtem Badumbau.', 0, 'b2c');
     insertProduct.run(cat5, 'Elektrorollstuhl', 'Leads mit Interesse an Elektrorollstühlen.', 0, 'b2c');
