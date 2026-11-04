@@ -1852,19 +1852,19 @@ router.get('/provisionen', (req, res) => {
       <form method="GET" action="/admin/provisionen" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
         <div class="form-group" style="margin-bottom:0;">
           <label>Partner</label>
-          <select name="partner_user_id">${partnerOptions}</select>
+          <select name="partner_user_id" style="padding:8px;border-radius:6px;border:1px solid var(--gray-300);">${partnerOptions}</select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label>Projekt</label>
-          <select name="product_id">${productOptions}</select>
+          <select name="product_id" style="padding:8px;border-radius:6px;border:1px solid var(--gray-300);">${productOptions}</select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label>Von *</label>
-          <input type="date" name="from" value="${from}" required>
+          <input type="date" name="from" value="${from}" required style="padding:8px;border-radius:6px;border:1px solid var(--gray-300);">
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label>Bis *</label>
-          <input type="date" name="to" value="${to}" required>
+          <input type="date" name="to" value="${to}" required style="padding:8px;border-radius:6px;border:1px solid var(--gray-300);">
         </div>
         <button type="submit" class="btn btn-primary btn-sm">Auswerten</button>
         <span style="display:flex;gap:6px;flex-wrap:wrap;">
