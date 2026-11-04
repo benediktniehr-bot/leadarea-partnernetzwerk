@@ -178,6 +178,15 @@
 </section>
 
 <script>
+(function () {
+  var dateInput = document.getElementById('appointment_date');
+  var today = new Date();
+  var maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 28);
+  function fmt(d) { return d.toISOString().slice(0, 10); }
+  dateInput.min = fmt(today);
+  dateInput.max = fmt(maxDate);
+})();
 var projectTilesError = document.getElementById('projectTilesError');
 document.querySelectorAll('.project-tile input[type=checkbox]').forEach(function (cb) {
   cb.addEventListener('change', function () {

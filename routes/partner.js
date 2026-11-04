@@ -133,6 +133,14 @@ router.post('/partner', async (req, res) => {
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
   }
 
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + 28);
+  const requestedDate = new Date(`${appointment_date}T00:00:00`);
+  if (isNaN(requestedDate) || requestedDate < today || requestedDate > maxDate) {
+    const alertHtml = '<div class="alert alert-error">Der Terminwunsch muss zwischen heute und in maximal 4 Wochen liegen.</div>';
+    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+  }
+
   if (!agb) {
     const alertHtml = '<div class="alert alert-error">Bitte akzeptiere die AGB.</div>';
     return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
