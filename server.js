@@ -95,6 +95,17 @@ app.get('/sitemap.xml', (req, res) => {
 
 const layoutHtml = fs.readFileSync(path.join(__dirname, 'views', 'layout.html'), 'utf8');
 
+// Übersetzte Header/Footer-Texte für die mehrsprachige Partner-Bewerbungsseite
+// (siehe routes/partner.js) - das gemeinsame Layout wird von ALLEN Seiten
+// genutzt, daher hier zentral statt in jeder View einzeln. Andere Seiten
+// (Marktplatz, Dashboard etc.) übergeben kein htmlLang und bekommen
+// automatisch die deutschen Standardtexte (Fallback unten).
+const NAV_LABELS = {
+  de: { partnerWerden: 'Partner werden', login: 'Login', registrieren: 'Registrieren', startseite: 'Startseite', partnerBaseHref: '/partner', partnerHref: '/partner#bewerbung' },
+  tr: { partnerWerden: 'İş Ortağı Ol', login: 'Giriş', registrieren: 'Kayıt Ol', startseite: 'Ana Sayfa', partnerBaseHref: '/partner/tr', partnerHref: '/partner/tr#bewerbung' },
+  bs: { partnerWerden: 'Postanite Partner', login: 'Prijava', registrieren: 'Registruj se', startseite: 'Početna', partnerBaseHref: '/partner/ba', partnerHref: '/partner/ba#bewerbung' },
+};
+
 function renderPage(res, viewName, data = {}) {
   const viewPath = path.join(__dirname, 'views', viewName);
   let content = fs.readFileSync(viewPath, 'utf8');
@@ -120,6 +131,7 @@ function renderPage(res, viewName, data = {}) {
   const adminBell = allData.user && allData.user.role === 'admin'
     ? `<a href="/admin/partners" class="bell-link" title="Neue Partner-Bewerbungen">🔔${newApplicationsCount > 0 ? `<span class="notify-badge">${newApplicationsCount}</span>` : ''}</a>`
     : '';
+  const navLang = NAV_LABELS[data.htmlLang] || NAV_LABELS.de;
   const navUser = allData.user
     ? `<div class="user-menu">
          <span class="user-greeting">Hallo, ${allData.user.firstName}</span>
@@ -127,8 +139,8 @@ function renderPage(res, viewName, data = {}) {
          ${allData.user.role === 'admin' ? `<a href="/admin" class="nav-link">Admin</a>${adminBell}` : ''}
          <a href="/logout" class="nav-link">Logout</a>
        </div>`
-    : `<a href="/login" class="nav-link">Login</a>
-       <a href="/partner#bewerbung" class="btn btn-primary btn-sm">Registrieren</a>`;
+    : `<a href="/login" class="nav-link">${navLang.login}</a>
+       <a href="${navLang.partnerHref}" class="btn btn-primary btn-sm">${navLang.registrieren}</a>`;
 
   // Partner-LeadArea ist strikt vom Marktplatz getrennt: ein Partner darf nie
   // sehen, zu welchem Preis "seine" Leads dort verkauft werden - deshalb auf
@@ -157,6 +169,10 @@ function renderPage(res, viewName, data = {}) {
   page = page.replace('{{content}}', content);
   page = page.replace('{{pageTitle}}', data.pageTitle || 'LeadArea');
   page = page.replace('{{htmlLang}}', data.htmlLang || 'de');
+  page = page.replace(/\{\{partnerHref\}\}/g, navLang.partnerHref);
+  page = page.replace(/\{\{partnerBaseHref\}\}/g, navLang.partnerBaseHref);
+  page = page.replace(/\{\{partnerWerdenLabel\}\}/g, navLang.partnerWerden);
+  page = page.replace(/\{\{startseiteLabel\}\}/g, navLang.startseite);
   page = page.replace('{{navUser}}', navUser);
   page = page.replace('{{navMarketplace}}', navMarketplace);
   page = page.replace('{{headerClaim}}', headerClaim);
