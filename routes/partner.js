@@ -11,6 +11,87 @@ const { getDeliveryTemplate } = require('../lib/deliveryTemplate');
 const UPLOADS_BASE = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'public', 'uploads');
 const partnerUpload = multer({ dest: path.join(UPLOADS_BASE, 'csv') });
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
+// Mehrsprachige Partner-Bewerbungsseite (Türkisch/Bosnisch, seit 2026-11-25 -
+// siehe Absprache mit Jens: Zielgruppe sind Callcenter-Betreiber in der
+// Türkei/im Balkan, die eher in ihrer eigenen Sprache suchen als auf
+// Deutsch). Rechtstexte (Datenschutz/AGB) bleiben bewusst deutsch, nur der
+// Zustimmungstext der Checkboxen ist übersetzt - üblich bei mehrsprachigen
+// B2B-Seiten und spart eine verfrühte Übersetzung noch nicht final
+// geprüfter Rechtstexte. Die Projekt-Kacheln (Branchen/Produktnamen aus der
+// DB) bleiben ebenfalls deutsch, um keine zweite Sprachspalte in
+// lead_products/lead_categories einführen zu müssen - vertretbar, da das
+// eigentliche Gespräch danach ohnehin persönlich/telefonisch läuft.
+const PARTNER_LANGS = {
+  de: {
+    view: 'partner.html',
+    htmlLang: 'de',
+    pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks',
+    metaDescription: 'Seit über 12 Jahren am Markt: Werde Partner von Partner-LeadArea und profitiere von langjährigen Kooperationen, einem großen Netzwerk und unserem Know-how.',
+    msg: {
+      allFields: 'Bitte fülle alle Pflichtfelder aus.',
+      appointment: 'Bitte gib einen Terminwunsch (Datum + Uhrzeit) an.',
+      dateRange: 'Der Terminwunsch muss zwischen heute und in maximal 4 Wochen liegen.',
+      agb: 'Bitte akzeptiere die AGB.',
+      emailExists: 'Diese E-Mail-Adresse ist bereits als Partner registriert. Bitte logge dich ein oder nutze eine andere E-Mail-Adresse.',
+      success: 'Danke für deine Bewerbung! Wir haben dir eine E-Mail mit den nächsten Schritten geschickt und melden uns zeitnah bei dir für ein persönliches Gespräch.',
+    },
+  },
+  tr: {
+    view: 'partner-tr.html',
+    htmlLang: 'tr',
+    pageTitle: 'LeadArea İş Ortaklığı Programı – Callcenterler İçin Üretim Ortağı Olun',
+    metaDescription: 'LeadArea\'nın iş ortağı olun: 12 yılı aşkın sektör deneyimi, uzun yıllara dayanan iş birlikleri, geniş bir ağ ve sektörel uzmanlık.',
+    msg: {
+      allFields: 'Lütfen tüm zorunlu alanları doldurun.',
+      appointment: 'Lütfen bir görüşme tarihi tercihi belirtin (tarih + saat).',
+      dateRange: 'Görüşme tarihi bugün ile en fazla 4 hafta sonrası arasında olmalıdır.',
+      agb: 'Lütfen Genel İş Koşullarını kabul edin.',
+      emailExists: 'Bu e-posta adresi zaten bir iş ortağı olarak kayıtlı. Lütfen giriş yapın veya farklı bir e-posta adresi kullanın.',
+      success: 'Başvurunuz için teşekkür ederiz! Sonraki adımları içeren bir e-posta gönderdik ve kişisel bir görüşme için yakında sizinle iletişime geçeceğiz.',
+    },
+  },
+  ba: {
+    view: 'partner-ba.html',
+    htmlLang: 'bs',
+    pageTitle: 'LeadArea Program Poslovnog Partnerstva – Postanite Proizvodni Partner za Call Centre',
+    metaDescription: 'Postanite poslovni partner LeadArea: više od 12 godina iskustva na tržištu, dugogodišnje saradnje, velika mreža i stručno znanje.',
+    msg: {
+      allFields: 'Molimo popunite sva obavezna polja.',
+      appointment: 'Molimo navedite željeni termin za sastanak (datum + vrijeme).',
+      dateRange: 'Željeni termin mora biti između danas i najviše 4 sedmice unaprijed.',
+      agb: 'Molimo prihvatite Opšte uslove poslovanja.',
+      emailExists: 'Ova e-mail adresa je već registrovana kao poslovni partner. Molimo prijavite se ili koristite drugu e-mail adresu.',
+      success: 'Hvala Vam na prijavi! Poslali smo Vam e-mail sa sljedećim koracima i uskoro ćemo Vas kontaktirati radi ličnog sastanka.',
+    },
+  },
+};
+
+function partnerHreflangHtml() {
+  return [
+    `<link rel="alternate" hreflang="de" href="${BASE_URL}/partner">`,
+    `<link rel="alternate" hreflang="tr" href="${BASE_URL}/partner/tr">`,
+    `<link rel="alternate" hreflang="bs" href="${BASE_URL}/partner/ba">`,
+    `<link rel="alternate" hreflang="x-default" href="${BASE_URL}/partner">`,
+  ].join('\n  ');
+}
+
+function renderPartnerPage(req, res, lang, extra = {}) {
+  const cfg = PARTNER_LANGS[lang] || PARTNER_LANGS.de;
+  const db = getDb();
+  const products = db.prepare('SELECT * FROM lead_products WHERE active = 1').all();
+  req.app.locals.renderPage(res, cfg.view, {
+    pageTitle: cfg.pageTitle,
+    metaDescription: cfg.metaDescription,
+    htmlLang: cfg.htmlLang,
+    hreflangHtml: partnerHreflangHtml(),
+    alertHtml: '',
+    projectTilesHtml: buildProjectTilesHtml(products),
+    ...extra,
+  });
+}
+
 // Projekt-Kacheln auf der Partner-LeadArea-Bewerbungsseite: gleiche Kategorien/
 // Produkte wie der Marktplatz, aber ohne Preis und als Checkbox-Mehrfachauswahl
 // statt Kauf-Button (CC wählt, mit welchen Projekten es zusammenarbeiten möchte).
@@ -106,50 +187,51 @@ function renderPartnerDashboard(req, res, content, activeTab) {
   });
 }
 
+// Sprach-Erkennung per Accept-Language-Header (bewusst NICHT per IP/Geo -
+// siehe Absprache mit Jens 2026-11-25: Browser-Spracheinstellung ist
+// zuverlässiger als geratener Standort, und Google rät von Geo-Redirects
+// ab, da der eigene Crawler oft aus den USA kommt). ?lang=de überschreibt
+// die Automatik bewusst (Link "Deutsch" auf den übersetzten Seiten).
 router.get('/partner', (req, res) => {
-  const db = getDb();
-  const products = db.prepare('SELECT * FROM lead_products WHERE active = 1').all();
-  req.app.locals.renderPage(res, 'partner.html', {
-    pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks',
-    metaDescription: 'Seit über 12 Jahren am Markt: Werde Partner von Partner-LeadArea und profitiere von langjährigen Kooperationen, einem großen Netzwerk und unserem Know-how.',
-    alertHtml: '',
-    projectTilesHtml: buildProjectTilesHtml(products),
-  });
+  if (req.query.lang !== 'de') {
+    const accept = (req.headers['accept-language'] || '').toLowerCase();
+    if (/\btr\b/.test(accept)) return res.redirect('/partner/tr');
+    if (/\b(bs|hr|sr)\b/.test(accept)) return res.redirect('/partner/ba');
+  }
+  renderPartnerPage(req, res, 'de');
 });
+
+router.get('/partner/tr', (req, res) => renderPartnerPage(req, res, 'tr'));
+router.get('/partner/ba', (req, res) => renderPartnerPage(req, res, 'ba'));
 
 router.post('/partner', async (req, res) => {
   const { company, first_name, last_name, street, house_number, postal_code, city, country, phone, email, tax_number, message, appointment_date, appointment_time, agb, newsletter } = req.body;
-  const db = getDb();
-  const products = db.prepare('SELECT * FROM lead_products WHERE active = 1').all();
-  const projectTilesHtml = buildProjectTilesHtml(products);
+  const lang = PARTNER_LANGS[req.body.lang] ? req.body.lang : 'de';
+  const msg = PARTNER_LANGS[lang].msg;
 
   if (!company || !first_name || !last_name || !street || !house_number || !postal_code || !city || !country || !phone || !email) {
-    const alertHtml = '<div class="alert alert-error">Bitte fülle alle Pflichtfelder aus.</div>';
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+    return renderPartnerPage(req, res, lang, { alertHtml: `<div class="alert alert-error">${msg.allFields}</div>` });
   }
 
   if (!appointment_date || !appointment_time) {
-    const alertHtml = '<div class="alert alert-error">Bitte gib einen Terminwunsch (Datum + Uhrzeit) an.</div>';
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+    return renderPartnerPage(req, res, lang, { alertHtml: `<div class="alert alert-error">${msg.appointment}</div>` });
   }
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + 28);
   const requestedDate = new Date(`${appointment_date}T00:00:00`);
   if (isNaN(requestedDate) || requestedDate < today || requestedDate > maxDate) {
-    const alertHtml = '<div class="alert alert-error">Der Terminwunsch muss zwischen heute und in maximal 4 Wochen liegen.</div>';
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+    return renderPartnerPage(req, res, lang, { alertHtml: `<div class="alert alert-error">${msg.dateRange}</div>` });
   }
 
   if (!agb) {
-    const alertHtml = '<div class="alert alert-error">Bitte akzeptiere die AGB.</div>';
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+    return renderPartnerPage(req, res, lang, { alertHtml: `<div class="alert alert-error">${msg.agb}</div>` });
   }
 
+  const db = getDb();
   const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
   if (existingUser) {
-    const alertHtml = '<div class="alert alert-error">Diese E-Mail-Adresse ist bereits als Partner registriert. Bitte logge dich ein oder nutze eine andere E-Mail-Adresse.</div>';
-    return req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+    return renderPartnerPage(req, res, lang, { alertHtml: `<div class="alert alert-error">${msg.emailExists}</div>` });
   }
 
   const appointmentDateObj = new Date(`${appointment_date}T${appointment_time}`);
@@ -172,7 +254,8 @@ router.post('/partner', async (req, res) => {
   // Stammdaten erfassen. Account + Passwort-Vergabe passiert erst, wenn der
   // Vertrag vorliegt und Jens/Frank den Partner im Admin auf "Angenommen"
   // setzen (siehe routes/admin.js, sendPartnerAccountActivationMail).
-  const projectNames = projectIds.map(id => (products.find(p => p.id === id) || {}).name).filter(Boolean);
+  const allProducts = db.prepare('SELECT * FROM lead_products WHERE active = 1').all();
+  const projectNames = projectIds.map(id => (allProducts.find(p => p.id === id) || {}).name).filter(Boolean);
   sendPartnerApplicationNotification({
     company, firstName: first_name, lastName: last_name, phone, email, country, projectNames,
     appointmentRequest: appointment_request, message,
@@ -183,8 +266,7 @@ router.post('/partner', async (req, res) => {
     appointmentRequest: appointment_request,
   }).catch(err => console.error('[Partner-Welcome-Mail] Mail-Versand fehlgeschlagen:', err));
 
-  const alertHtml = '<div class="alert alert-success">Danke für deine Bewerbung! Wir haben dir eine E-Mail mit den nächsten Schritten geschickt und melden uns zeitnah bei dir für ein persönliches Gespräch.</div>';
-  req.app.locals.renderPage(res, 'partner.html', { pageTitle: 'Partner-LeadArea – Werde Teil unseres Netzwerks', alertHtml, projectTilesHtml });
+  renderPartnerPage(req, res, lang, { alertHtml: `<div class="alert alert-success">${msg.success}</div>` });
 });
 
 // PARTNER DASHBOARD

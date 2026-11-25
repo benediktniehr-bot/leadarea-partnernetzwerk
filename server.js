@@ -156,6 +156,7 @@ function renderPage(res, viewName, data = {}) {
   let page = layoutHtml;
   page = page.replace('{{content}}', content);
   page = page.replace('{{pageTitle}}', data.pageTitle || 'LeadArea');
+  page = page.replace('{{htmlLang}}', data.htmlLang || 'de');
   page = page.replace('{{navUser}}', navUser);
   page = page.replace('{{navMarketplace}}', navMarketplace);
   page = page.replace('{{headerClaim}}', headerClaim);

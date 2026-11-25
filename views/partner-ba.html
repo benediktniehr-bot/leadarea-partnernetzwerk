@@ -1,0 +1,209 @@
+<section class="partner-hero">
+  <div class="container">
+    <div class="lang-switch" style="margin-bottom:14px;font-size:0.85rem;opacity:0.85;">
+      <a href="/partner?lang=de">Deutsch</a> · <a href="/partner/tr">Türkçe</a> · <strong>Bosanski</strong>
+    </div>
+    <h1 class="shine-text">LeadArea Program Poslovnog Partnerstva</h1>
+    <p>Na tržištu smo više od 12 godina. Sa pojedinim klijentima sarađujemo i duže od 10 godina. Pridružite se našoj mreži poslovnih partnera i iskoristite dugogodišnju saradnju i naše stručno znanje.</p>
+    {{alertHtml}}
+  </div>
+</section>
+
+<section class="marketplace-products partner-projects">
+  <div class="container">
+    <h2 class="section-title">Na kojim projektima želite sarađivati sa nama?</h2>
+    <p class="section-subtitle">Izaberite jednu ili više grana koje odgovaraju Vašoj firmi – tako ćemo Vas moći rasporediti na najprikladniji projekat.</p>
+    {{projectTilesHtml}}
+    <p id="projectTilesError" class="alert alert-error" style="display:none;margin-top:20px;">Molimo izaberite najmanje jedan projekat koji odgovara Vašoj firmi.</p>
+  </div>
+</section>
+
+<section class="partner-section" id="bewerbung">
+  <div class="container partner-inner">
+    <div class="partner-content">
+      <h2>Pridružite se našoj mreži poslovnih partnera.</h2>
+      <p>Nakon Vaše prijave, rado ćemo zakazati sastanak kako bismo se bolje upoznali i razgovarali o svim detaljima naše saradnje.</p>
+      <ul class="partner-benefits">
+        <li><span class="check">&#10003;</span> Više od 12 godina iskustva u ovoj djelatnosti</li>
+        <li><span class="check">&#10003;</span> Dugogodišnje, pouzdane poslovne saradnje</li>
+        <li><span class="check">&#10003;</span> Velika mreža poslovnih partnera i stručno znanje</li>
+      </ul>
+    </div>
+    <div class="partner-form">
+      <h3>Prijavite se odmah</h3>
+      <form method="POST" action="/partner" id="partnerForm">
+        <input type="hidden" name="lang" value="ba">
+        <div class="form-group">
+          <label for="company">Naziv firme *</label>
+          <input type="text" id="company" name="company" placeholder="Naziv firme" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">Ime kontakt osobe *</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Ime" required>
+          </div>
+          <div class="form-group">
+            <label for="last_name">Prezime kontakt osobe *</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Prezime" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="street">Ulica *</label>
+            <input type="text" id="street" name="street" placeholder="Ulica" required>
+          </div>
+          <div class="form-group">
+            <label for="house_number">Kućni broj *</label>
+            <input type="text" id="house_number" name="house_number" placeholder="Br." required style="max-width:120px;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="postal_code">Poštanski broj *</label>
+            <input type="text" id="postal_code" name="postal_code" placeholder="Poštanski broj" required style="max-width:120px;">
+          </div>
+          <div class="form-group">
+            <label for="city">Grad *</label>
+            <input type="text" id="city" name="city" placeholder="Grad" required>
+          </div>
+          <div class="form-group">
+            <label for="country">Država *</label>
+            <select id="country" name="country" required>
+              <option value="DE" selected>Njemačka</option>
+              <option value="TR">Turska</option>
+              <option value="GR">Grčka</option>
+              <option value="XK">Kosovo</option>
+              <option value="RS">Srbija</option>
+              <option value="BA">Bosna i Hercegovina</option>
+              <option value="HR">Hrvatska</option>
+              <option value="ME">Crna Gora</option>
+              <option value="MK">Sjeverna Makedonija</option>
+              <option value="AL">Albanija</option>
+              <option value="BG">Bugarska</option>
+              <option value="RO">Rumunija</option>
+              <option value="HU">Mađarska</option>
+              <option value="PL">Poljska</option>
+              <option value="CZ">Češka</option>
+              <option value="SK">Slovačka</option>
+              <option value="SI">Slovenija</option>
+              <option value="UA">Ukrajina</option>
+              <option value="RU">Rusija</option>
+              <option value="MD">Moldavija</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Broj telefona *</label>
+            <input type="tel" id="phone" name="phone" placeholder="Broj telefona" required>
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail adresa *</label>
+            <input type="email" id="email" name="email" placeholder="E-mail adresa" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tax_number">Porezni broj</label>
+          <input type="text" id="tax_number" name="tax_number" placeholder="Porezni broj (opcionalno)">
+        </div>
+        <div class="form-group">
+          <label>Željeni termin za sastanak *</label>
+          <div style="display:flex;gap:10px;">
+            <input type="date" id="appointment_date" name="appointment_date" required style="flex:1;">
+            <select id="appointment_time" name="appointment_time" required style="flex:1;">
+              <option value="" disabled selected>Izaberite vrijeme</option>
+              <option value="08:30">08:30</option>
+              <option value="08:45">08:45</option>
+              <option value="09:00">09:00</option>
+              <option value="09:15">09:15</option>
+              <option value="09:30">09:30</option>
+              <option value="09:45">09:45</option>
+              <option value="10:00">10:00</option>
+              <option value="10:15">10:15</option>
+              <option value="10:30">10:30</option>
+              <option value="10:45">10:45</option>
+              <option value="11:00">11:00</option>
+              <option value="11:15">11:15</option>
+              <option value="11:30">11:30</option>
+              <option value="11:45">11:45</option>
+              <option value="12:00">12:00</option>
+              <option value="12:15">12:15</option>
+              <option value="12:30">12:30</option>
+              <option value="12:45">12:45</option>
+              <option value="13:00">13:00</option>
+              <option value="13:15">13:15</option>
+              <option value="13:30">13:30</option>
+              <option value="13:45">13:45</option>
+              <option value="14:00">14:00</option>
+              <option value="14:15">14:15</option>
+              <option value="14:30">14:30</option>
+              <option value="14:45">14:45</option>
+              <option value="15:00">15:00</option>
+              <option value="15:15">15:15</option>
+              <option value="15:30">15:30</option>
+              <option value="15:45">15:45</option>
+              <option value="16:00">16:00</option>
+              <option value="16:15">16:15</option>
+              <option value="16:30">16:30</option>
+              <option value="16:45">16:45</option>
+              <option value="17:00">17:00</option>
+              <option value="17:15">17:15</option>
+              <option value="17:30">17:30</option>
+              <option value="17:45">17:45</option>
+              <option value="18:00">18:00</option>
+              <option value="18:15">18:15</option>
+              <option value="18:30">18:30</option>
+              <option value="18:45">18:45</option>
+              <option value="19:00">19:00</option>
+            </select>
+          </div>
+          <p style="margin-top:6px;font-size:0.8rem;color:var(--gray-300);">Navedena vremena su po švicarskom vremenu (CH). Ako se nalazite u drugoj vremenskoj zoni, molimo uzmite to u obzir.</p>
+        </div>
+        <div class="form-group">
+          <label for="message">Recite nam nešto o Vašoj firmi</label>
+          <textarea id="message" name="message" placeholder="Koliko predstavnika/agenata imate? U kojim djelatnostima imate iskustva?"></textarea>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="dsgvo" name="dsgvo" required>
+          <label for="dsgvo">Slažem se sa obradom mojih ličnih podataka u skladu sa <a href="/datenschutz" target="_blank" style="color:var(--primary);">Politikom privatnosti</a>.</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="agb" name="agb" required>
+          <label for="agb">Prihvatam <a href="#" style="color:var(--primary);">Opšte uslove poslovanja</a>. *</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="newsletter" name="newsletter">
+          <label for="newsletter">Želim primati newsletter sa poslovnim prilikama i novostima (dobrovoljno, pretplata se može otkazati u bilo kojem trenutku).</label>
+        </div>
+        <button type="submit" class="btn btn-accent btn-block">Pošaljite prijavu</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var dateInput = document.getElementById('appointment_date');
+  var today = new Date();
+  var maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 28);
+  function fmt(d) { return d.toISOString().slice(0, 10); }
+  dateInput.min = fmt(today);
+  dateInput.max = fmt(maxDate);
+})();
+var projectTilesError = document.getElementById('projectTilesError');
+document.querySelectorAll('.project-tile input[type=checkbox]').forEach(function (cb) {
+  cb.addEventListener('change', function () {
+    cb.closest('.project-tile').classList.toggle('selected', cb.checked);
+    if (cb.checked) projectTilesError.style.display = 'none';
+  });
+});
+document.getElementById('partnerForm').addEventListener('submit', function (e) {
+  var anyChecked = document.querySelectorAll('.project-tile input[type=checkbox]:checked').length > 0;
+  if (!anyChecked) {
+    e.preventDefault();
+    projectTilesError.style.display = 'block';
+    projectTilesError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+</script>
