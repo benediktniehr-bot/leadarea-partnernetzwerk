@@ -145,6 +145,11 @@ nav { display: flex; align-items: center; gap: 24px; }
   border-radius: 10px;
   margin-left: 4px;
 }
+.lang-switch-flags { display: flex; align-items: center; gap: 7px; margin-right: 4px; }
+.lang-switch-flags .lang-flag { display: block; line-height: 0; opacity: 0.45; filter: grayscale(70%); transition: opacity 0.2s, filter 0.2s; }
+.lang-switch-flags .lang-flag svg { display: block; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,0.18); }
+.lang-switch-flags .lang-flag:hover { opacity: 1; filter: none; }
+.lang-switch-flags .lang-flag.active { opacity: 1; filter: none; }
 .mobile-toggle {
   display: none;
   background: none;

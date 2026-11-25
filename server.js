@@ -106,6 +106,24 @@ const NAV_LABELS = {
   bs: { partnerWerden: 'Postanite Partner', login: 'Prijava', registrieren: 'Registruj se', startseite: 'Početna', partnerBaseHref: '/partner/ba', partnerHref: '/partner/ba#bewerbung' },
 };
 
+// Flaggen-Sprachswitcher im Header (site-weit sichtbar, siehe layout.html).
+// Zielt bewusst immer auf /partner(/tr|/ba), da das aktuell die einzigen
+// übersetzten Seiten sind - andere Bereiche (Marktplatz etc.) bleiben Deutsch.
+// Echte SVG-Flaggen statt Emoji: Flaggen-Emojis rendern auf vielen
+// Windows/Chrome-Kombinationen nur als graue Buchstabenkuerzel
+// ("DE TR BA") statt als bunte Flagge - mit eingebetteten SVGs sieht es
+// garantiert auf jedem Geraet gleich aus.
+const FLAG_SVG = {
+  de: '<svg viewBox="0 0 30 18" width="20" height="14"><rect width="30" height="6" y="0" fill="#000"/><rect width="30" height="6" y="6" fill="#DD0000"/><rect width="30" height="6" y="12" fill="#FFCE00"/></svg>',
+  tr: '<svg viewBox="0 0 30 20" width="20" height="14"><rect width="30" height="20" fill="#E30A17"/><circle cx="12" cy="10" r="5" fill="#fff"/><circle cx="13.5" cy="10" r="4" fill="#E30A17"/><circle cx="20" cy="10" r="1.6" fill="#fff"/></svg>',
+  bs: '<svg viewBox="0 0 30 20" width="20" height="14"><rect width="30" height="20" fill="#002395"/><polygon points="0,0 14,0 0,20" fill="#FECB00"/><g fill="#fff"><circle cx="19" cy="2" r="1"/><circle cx="21.5" cy="5.5" r="1"/><circle cx="24" cy="9" r="1"/><circle cx="26.5" cy="12.5" r="1"/><circle cx="29" cy="16" r="1"/></g></svg>',
+};
+const LANG_FLAGS = [
+  { code: 'de', flag: FLAG_SVG.de, href: '/partner', title: 'Deutsch' },
+  { code: 'tr', flag: FLAG_SVG.tr, href: '/partner/tr', title: 'Türkçe' },
+  { code: 'bs', flag: FLAG_SVG.bs, href: '/partner/ba', title: 'Bosanski' },
+];
+
 function renderPage(res, viewName, data = {}) {
   const viewPath = path.join(__dirname, 'views', viewName);
   let content = fs.readFileSync(viewPath, 'utf8');
@@ -132,6 +150,10 @@ function renderPage(res, viewName, data = {}) {
     ? `<a href="/admin/partners" class="bell-link" title="Neue Partner-Bewerbungen">🔔${newApplicationsCount > 0 ? `<span class="notify-badge">${newApplicationsCount}</span>` : ''}</a>`
     : '';
   const navLang = NAV_LABELS[data.htmlLang] || NAV_LABELS.de;
+  const currentLang = data.htmlLang || 'de';
+  const langSwitcherHtml = `<div class="lang-switch-flags">${LANG_FLAGS.map(l =>
+    `<a href="${l.href}" class="lang-flag${l.code === currentLang ? ' active' : ''}" title="${l.title}" aria-label="${l.title}">${l.flag}</a>`
+  ).join('')}</div>`;
   const navUser = allData.user
     ? `<div class="user-menu">
          <span class="user-greeting">Hallo, ${allData.user.firstName}</span>
@@ -175,6 +197,7 @@ function renderPage(res, viewName, data = {}) {
   page = page.replace(/\{\{startseiteLabel\}\}/g, navLang.startseite);
   page = page.replace('{{navUser}}', navUser);
   page = page.replace('{{navMarketplace}}', navMarketplace);
+  page = page.replace('{{langSwitcherHtml}}', langSwitcherHtml);
   page = page.replace('{{headerClaim}}', headerClaim);
   page = page.replace('{{headerClaimClass}}', headerClaimClass);
   page = page.replace('{{footerMarketplace}}', footerMarketplace);
