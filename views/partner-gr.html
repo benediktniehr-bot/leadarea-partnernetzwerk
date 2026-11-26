@@ -1,0 +1,209 @@
+<section class="partner-hero">
+  <div class="container">
+    <div class="lang-switch" style="margin-bottom:14px;font-size:0.85rem;opacity:0.85;">
+      <a href="/partner?lang=de">Deutsch</a> · <a href="/partner/tr">Türkçe</a> · <a href="/partner/ba">Bosanski</a> · <strong>Ελληνικά</strong>
+    </div>
+    <h1 class="shine-text">LeadArea – Πρόγραμμα Επιχειρηματικής Συνεργασίας</h1>
+    <p>Δραστηριοποιούμαστε στην αγορά εδώ και περισσότερα από 12 χρόνια, ενώ με ορισμένους πελάτες μας συνεργαζόμαστε για πάνω από 10 χρόνια. Γίνετε μέλος του δικτύου συνεργατών μας και επωφεληθείτε από τις μακροχρόνιες συνεργασίες και την τεχνογνωσία μας.</p>
+    {{alertHtml}}
+  </div>
+</section>
+
+<section class="marketplace-products partner-projects">
+  <div class="container">
+    <h2 class="section-title">Σε ποια έργα θα θέλατε να συνεργαστείτε μαζί μας;</h2>
+    <p class="section-subtitle">Επιλέξτε έναν ή περισσότερους κλάδους που ταιριάζουν στην εταιρεία σας, ώστε να σας προτείνουμε τα καταλληλότερα έργα για συνεργασία.</p>
+    {{projectTilesHtml}}
+    <p id="projectTilesError" class="alert alert-error" style="display:none;margin-top:20px;">Παρακαλούμε επιλέξτε τουλάχιστον ένα έργο που ταιριάζει στην εταιρεία σας.</p>
+  </div>
+</section>
+
+<section class="partner-section" id="bewerbung">
+  <div class="container partner-inner">
+    <div class="partner-content">
+      <h2>Γίνετε μέλος του δικτύου συνεργατών μας.</h2>
+      <p>Μετά την υποβολή της αίτησής σας, θα χαρούμε να προγραμματίσουμε μια συνάντηση γνωριμίας, ώστε να συζητήσουμε αναλυτικά όλες τις λεπτομέρειες μιας πιθανής συνεργασίας.</p>
+      <ul class="partner-benefits">
+        <li><span class="check">&#10003;</span> Πάνω από 12 χρόνια εμπειρίας στον κλάδο</li>
+        <li><span class="check">&#10003;</span> Μακροχρόνιες και αξιόπιστες συνεργασίες</li>
+        <li><span class="check">&#10003;</span> Ευρύ δίκτυο συνεργατών και εξειδικευμένη τεχνογνωσία</li>
+      </ul>
+    </div>
+    <div class="partner-form">
+      <h3>Υποβάλετε την αίτησή σας τώρα</h3>
+      <form method="POST" action="/partner" id="partnerForm">
+        <input type="hidden" name="lang" value="gr">
+        <div class="form-group">
+          <label for="company">Επωνυμία εταιρείας *</label>
+          <input type="text" id="company" name="company" placeholder="Επωνυμία εταιρείας" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">Όνομα (υπεύθυνος επικοινωνίας) *</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Όνομα" required>
+          </div>
+          <div class="form-group">
+            <label for="last_name">Επώνυμο (υπεύθυνος επικοινωνίας) *</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Επώνυμο" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="street">Οδός *</label>
+            <input type="text" id="street" name="street" placeholder="Οδός" required>
+          </div>
+          <div class="form-group">
+            <label for="house_number">Αριθμός *</label>
+            <input type="text" id="house_number" name="house_number" placeholder="Αρ." required style="max-width:120px;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="postal_code">Ταχυδρομικός κώδικας (Τ.Κ.) *</label>
+            <input type="text" id="postal_code" name="postal_code" placeholder="Τ.Κ." required style="max-width:120px;">
+          </div>
+          <div class="form-group">
+            <label for="city">Πόλη *</label>
+            <input type="text" id="city" name="city" placeholder="Πόλη" required>
+          </div>
+          <div class="form-group">
+            <label for="country">Χώρα *</label>
+            <select id="country" name="country" required>
+              <option value="DE" selected>Γερμανία</option>
+              <option value="TR">Τουρκία</option>
+              <option value="GR">Ελλάδα</option>
+              <option value="XK">Κόσοβο</option>
+              <option value="RS">Σερβία</option>
+              <option value="BA">Βοσνία και Ερζεγοβίνη</option>
+              <option value="HR">Κροατία</option>
+              <option value="ME">Μαυροβούνιο</option>
+              <option value="MK">Βόρεια Μακεδονία</option>
+              <option value="AL">Αλβανία</option>
+              <option value="BG">Βουλγαρία</option>
+              <option value="RO">Ρουμανία</option>
+              <option value="HU">Ουγγαρία</option>
+              <option value="PL">Πολωνία</option>
+              <option value="CZ">Τσεχία</option>
+              <option value="SK">Σλοβακία</option>
+              <option value="SI">Σλοβενία</option>
+              <option value="UA">Ουκρανία</option>
+              <option value="RU">Ρωσία</option>
+              <option value="MD">Μολδαβία</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Αριθμός τηλεφώνου *</label>
+            <input type="tel" id="phone" name="phone" placeholder="Αριθμός τηλεφώνου" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" placeholder="Διεύθυνση email" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tax_number">Α.Φ.Μ.</label>
+          <input type="text" id="tax_number" name="tax_number" placeholder="Α.Φ.Μ. (προαιρετικό)">
+        </div>
+        <div class="form-group">
+          <label>Επιθυμητή ημερομηνία ραντεβού *</label>
+          <div style="display:flex;gap:10px;">
+            <input type="date" id="appointment_date" name="appointment_date" required style="flex:1;">
+            <select id="appointment_time" name="appointment_time" required style="flex:1;">
+              <option value="" disabled selected>Επιλέξτε ώρα</option>
+              <option value="08:30">08:30</option>
+              <option value="08:45">08:45</option>
+              <option value="09:00">09:00</option>
+              <option value="09:15">09:15</option>
+              <option value="09:30">09:30</option>
+              <option value="09:45">09:45</option>
+              <option value="10:00">10:00</option>
+              <option value="10:15">10:15</option>
+              <option value="10:30">10:30</option>
+              <option value="10:45">10:45</option>
+              <option value="11:00">11:00</option>
+              <option value="11:15">11:15</option>
+              <option value="11:30">11:30</option>
+              <option value="11:45">11:45</option>
+              <option value="12:00">12:00</option>
+              <option value="12:15">12:15</option>
+              <option value="12:30">12:30</option>
+              <option value="12:45">12:45</option>
+              <option value="13:00">13:00</option>
+              <option value="13:15">13:15</option>
+              <option value="13:30">13:30</option>
+              <option value="13:45">13:45</option>
+              <option value="14:00">14:00</option>
+              <option value="14:15">14:15</option>
+              <option value="14:30">14:30</option>
+              <option value="14:45">14:45</option>
+              <option value="15:00">15:00</option>
+              <option value="15:15">15:15</option>
+              <option value="15:30">15:30</option>
+              <option value="15:45">15:45</option>
+              <option value="16:00">16:00</option>
+              <option value="16:15">16:15</option>
+              <option value="16:30">16:30</option>
+              <option value="16:45">16:45</option>
+              <option value="17:00">17:00</option>
+              <option value="17:15">17:15</option>
+              <option value="17:30">17:30</option>
+              <option value="17:45">17:45</option>
+              <option value="18:00">18:00</option>
+              <option value="18:15">18:15</option>
+              <option value="18:30">18:30</option>
+              <option value="18:45">18:45</option>
+              <option value="19:00">19:00</option>
+            </select>
+          </div>
+          <p style="margin-top:6px;font-size:0.8rem;color:var(--gray-300);">Όλες οι διαθέσιμες ώρες ραντεβού αναφέρονται στην τοπική ώρα της Ελβετίας (CET/CEST). Εάν βρίσκεστε στην Ελλάδα, παρακαλούμε λάβετε υπόψη ότι η τοπική ώρα στην Ελλάδα είναι μία ώρα μπροστά από την ώρα της Ελβετίας.</p>
+        </div>
+        <div class="form-group">
+          <label for="message">Πείτε μας λίγα λόγια για την εταιρεία σας.</label>
+          <textarea id="message" name="message" placeholder="Πόσους agents διαθέτει η εταιρεία σας; Σε ποιους κλάδους έχετε εμπειρία;"></textarea>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="dsgvo" name="dsgvo" required>
+          <label for="dsgvo">Συναινώ στην επεξεργασία των προσωπικών μου δεδομένων σύμφωνα με την <a href="/datenschutz" target="_blank" style="color:var(--primary);">Πολιτική Απορρήτου</a>.</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="agb" name="agb" required>
+          <label for="agb">Αποδέχομαι τους <a href="#" style="color:var(--primary);">Γενικούς Όρους Συναλλαγών</a>. *</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="newsletter" name="newsletter">
+          <label for="newsletter">Επιθυμώ να λαμβάνω το newsletter με νέα και προσφορές (προαιρετικά, με δυνατότητα ανάκλησης της συγκατάθεσής μου ανά πάσα στιγμή).</label>
+        </div>
+        <button type="submit" class="btn btn-accent btn-block">Υποβολή αίτησης</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var dateInput = document.getElementById('appointment_date');
+  var today = new Date();
+  var maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 28);
+  function fmt(d) { return d.toISOString().slice(0, 10); }
+  dateInput.min = fmt(today);
+  dateInput.max = fmt(maxDate);
+})();
+var projectTilesError = document.getElementById('projectTilesError');
+document.querySelectorAll('.project-tile input[type=checkbox]').forEach(function (cb) {
+  cb.addEventListener('change', function () {
+    cb.closest('.project-tile').classList.toggle('selected', cb.checked);
+    if (cb.checked) projectTilesError.style.display = 'none';
+  });
+});
+document.getElementById('partnerForm').addEventListener('submit', function (e) {
+  var anyChecked = document.querySelectorAll('.project-tile input[type=checkbox]:checked').length > 0;
+  if (!anyChecked) {
+    e.preventDefault();
+    projectTilesError.style.display = 'block';
+    projectTilesError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+</script>

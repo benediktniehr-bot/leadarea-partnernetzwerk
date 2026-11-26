@@ -104,6 +104,7 @@ const NAV_LABELS = {
   de: { partnerWerden: 'Partner werden', login: 'Login', registrieren: 'Registrieren', startseite: 'Startseite', partnerBaseHref: '/partner', partnerHref: '/partner#bewerbung' },
   tr: { partnerWerden: 'İş Ortağı Ol', login: 'Giriş', registrieren: 'Kayıt Ol', startseite: 'Ana Sayfa', partnerBaseHref: '/partner/tr', partnerHref: '/partner/tr#bewerbung' },
   bs: { partnerWerden: 'Postanite Partner', login: 'Prijava', registrieren: 'Registruj se', startseite: 'Početna', partnerBaseHref: '/partner/ba', partnerHref: '/partner/ba#bewerbung' },
+  el: { partnerWerden: 'Γίνετε συνεργάτης', login: 'Σύνδεση', registrieren: 'Εγγραφή', startseite: 'Αρχική', partnerBaseHref: '/partner/gr', partnerHref: '/partner/gr#bewerbung' },
 };
 
 // Flaggen-Sprachswitcher im Header (site-weit sichtbar, siehe layout.html).
@@ -117,11 +118,13 @@ const FLAG_SVG = {
   de: '<svg viewBox="0 0 30 18" width="20" height="14"><rect width="30" height="6" y="0" fill="#000"/><rect width="30" height="6" y="6" fill="#DD0000"/><rect width="30" height="6" y="12" fill="#FFCE00"/></svg>',
   tr: '<svg viewBox="0 0 30 20" width="20" height="14"><rect width="30" height="20" fill="#E30A17"/><circle cx="12" cy="10" r="5" fill="#fff"/><circle cx="13.5" cy="10" r="4" fill="#E30A17"/><circle cx="20" cy="10" r="1.6" fill="#fff"/></svg>',
   bs: '<svg viewBox="0 0 30 20" width="20" height="14"><rect width="30" height="20" fill="#002395"/><polygon points="0,0 14,0 0,20" fill="#FECB00"/><g fill="#fff"><circle cx="19" cy="2" r="1"/><circle cx="21.5" cy="5.5" r="1"/><circle cx="24" cy="9" r="1"/><circle cx="26.5" cy="12.5" r="1"/><circle cx="29" cy="16" r="1"/></g></svg>',
+  el: '<svg viewBox="0 0 27 18" width="20" height="14"><rect width="27" height="18" fill="#0D5EAF"/><rect y="2" width="27" height="2" fill="#fff"/><rect y="6" width="27" height="2" fill="#fff"/><rect y="10" width="27" height="2" fill="#fff"/><rect y="14" width="27" height="2" fill="#fff"/><rect width="10" height="10" fill="#0D5EAF"/><rect x="4" width="2" height="10" fill="#fff"/><rect y="4" width="10" height="2" fill="#fff"/></svg>',
 };
 const LANG_FLAGS = [
   { code: 'de', flag: FLAG_SVG.de, href: '/partner', title: 'Deutsch' },
   { code: 'tr', flag: FLAG_SVG.tr, href: '/partner/tr', title: 'Türkçe' },
   { code: 'bs', flag: FLAG_SVG.bs, href: '/partner/ba', title: 'Bosanski' },
+  { code: 'el', flag: FLAG_SVG.el, href: '/partner/gr', title: 'Ελληνικά' },
 ];
 
 function renderPage(res, viewName, data = {}) {

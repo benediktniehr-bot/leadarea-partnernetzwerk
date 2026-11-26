@@ -66,6 +66,20 @@ const PARTNER_LANGS = {
       success: 'Hvala Vam na prijavi! Poslali smo Vam e-mail sa sljedećim koracima i uskoro ćemo Vas kontaktirati radi ličnog sastanka.',
     },
   },
+  gr: {
+    view: 'partner-gr.html',
+    htmlLang: 'el',
+    pageTitle: 'LeadArea – Πρόγραμμα Επιχειρηματικής Συνεργασίας για Call Centers',
+    metaDescription: 'Γίνετε συνεργάτης της LeadArea: πάνω από 12 χρόνια εμπειρίας στον κλάδο, μακροχρόνιες συνεργασίες, ευρύ δίκτυο συνεργατών και εξειδικευμένη τεχνογνωσία.',
+    msg: {
+      allFields: 'Παρακαλούμε συμπληρώστε όλα τα υποχρεωτικά πεδία.',
+      appointment: 'Παρακαλούμε επιλέξτε την επιθυμητή ημερομηνία και ώρα του ραντεβού σας.',
+      dateRange: 'Η επιθυμητή ημερομηνία ραντεβού πρέπει να είναι από σήμερα έως και τέσσερις εβδομάδες μετά.',
+      agb: 'Παρακαλούμε αποδεχτείτε τους Γενικούς Όρους Συναλλαγών.',
+      emailExists: 'Η συγκεκριμένη διεύθυνση email χρησιμοποιείται ήδη από εγγεγραμμένο συνεργάτη. Παρακαλούμε συνδεθείτε ή χρησιμοποιήστε διαφορετική διεύθυνση email.',
+      success: 'Σας ευχαριστούμε για την αίτησή σας! Σας έχουμε αποστείλει ένα email με πληροφορίες σχετικά με τα επόμενα βήματα. Σύντομα θα επικοινωνήσουμε μαζί σας για να προγραμματίσουμε μια συνάντηση γνωριμίας.',
+    },
+  },
 };
 
 function partnerHreflangHtml() {
@@ -73,6 +87,7 @@ function partnerHreflangHtml() {
     `<link rel="alternate" hreflang="de" href="${BASE_URL}/partner">`,
     `<link rel="alternate" hreflang="tr" href="${BASE_URL}/partner/tr">`,
     `<link rel="alternate" hreflang="bs" href="${BASE_URL}/partner/ba">`,
+    `<link rel="alternate" hreflang="el" href="${BASE_URL}/partner/gr">`,
     `<link rel="alternate" hreflang="x-default" href="${BASE_URL}/partner">`,
   ].join('\n  ');
 }
@@ -197,12 +212,14 @@ router.get('/partner', (req, res) => {
     const accept = (req.headers['accept-language'] || '').toLowerCase();
     if (/\btr\b/.test(accept)) return res.redirect('/partner/tr');
     if (/\b(bs|hr|sr)\b/.test(accept)) return res.redirect('/partner/ba');
+    if (/\bel\b/.test(accept)) return res.redirect('/partner/gr');
   }
   renderPartnerPage(req, res, 'de');
 });
 
 router.get('/partner/tr', (req, res) => renderPartnerPage(req, res, 'tr'));
 router.get('/partner/ba', (req, res) => renderPartnerPage(req, res, 'ba'));
+router.get('/partner/gr', (req, res) => renderPartnerPage(req, res, 'gr'));
 
 router.post('/partner', async (req, res) => {
   const { company, first_name, last_name, street, house_number, postal_code, city, country, phone, email, tax_number, message, appointment_date, appointment_time, agb, newsletter } = req.body;
