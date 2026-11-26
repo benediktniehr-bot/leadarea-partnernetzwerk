@@ -265,6 +265,9 @@ section { padding: 80px 0; }
   max-width: 600px;
   margin: 0 auto;
 }
+.partner-hero .lang-switch a { color: var(--gray-300); }
+.partner-hero .lang-switch a:hover { color: var(--white); }
+.partner-hero .lang-switch strong { color: var(--white); }
 /* MARKETPLACE PRODUCTS - dark, understated, B2B-professional (matches product photography) */
 .marketplace-products {
   background: linear-gradient(180deg, var(--dark) 0%, #142033 100%);
@@ -554,6 +557,7 @@ footer { background: var(--dark); color: var(--gray-300); padding: 48px 0 24px; 
 @media (max-width: 768px) {
   .hero-inner { flex-direction: column; text-align: center; }
   .hero-content h1 { font-size: 2rem; }
+  .shine-text-long { font-size: 1.6rem; }
   .hero-features { justify-content: center; }
   .hero-image-placeholder { height: 220px; }
   .steps { grid-template-columns: 1fr; }
@@ -576,6 +580,7 @@ footer { background: var(--dark); color: var(--gray-300); padding: 48px 0 24px; 
 @media (max-width: 480px) {
   .footer-grid { grid-template-columns: 1fr; }
   .stats { gap: 30px; }
+  .shine-text-long { font-size: 1.3rem; }
 }
 
 /* Druckansicht (z.B. Rechnungen) */
