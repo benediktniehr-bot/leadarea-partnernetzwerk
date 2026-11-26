@@ -259,6 +259,10 @@ section { padding: 80px 0; }
   display: inline-block;
   color: #4ade80;
 }
+/* Griechische Großbuchstaben mit Akzenten wirken bei Extra-Bold (800) deutlich
+   wuchtiger als in anderen Sprachen - nur für die griechische Überschrift
+   etwas leichter, Design der anderen Sprachen bleibt unverändert. */
+.shine-text-long { font-weight: 700; }
 .marketplace-hero p, .partner-hero p {
   color: var(--gray-300);
   font-size: 1.05rem;
